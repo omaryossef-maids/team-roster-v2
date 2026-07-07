@@ -323,30 +323,62 @@
     .modal.edit-mode .add-footer { display: none; }
     .modal.edit-mode .edit-footer { display: flex; }
     .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
-    .agents-toolbar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
-    .agents-selcount { font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; }
-    .agents-status { margin-left: auto; font-size: 0.8rem; font-weight: 700; }
-    .agents-status.saved { color: #059669; }
-    .agents-status.submitted { color: var(--primary-color); }
-    table.agents-table tbody td { vertical-align: middle; }
-    table.agents-table select.cell-purpose { width: 100%; font-size: 0.74rem; padding: 0.3rem 0.4rem; border: 1px solid var(--border-color); border-radius: 0.35rem; font-family: inherit; background:#fff; }
-    .bonus-cell { display: flex; align-items: center; gap: 0.35rem; }
-    .bonus-cell .cur-mini { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); background: var(--bg-tertiary); padding: 0.1rem 0.3rem; border-radius: 0.3rem; }
-    .bonus-cell input.cell-amt { width: 100%; font-size: 0.76rem; padding: 0.3rem 0.4rem; border: 1px solid var(--border-color); border-radius: 0.35rem; font-family: inherit; text-align: right; }
-    table.agents-table input[type=checkbox], #agentsSelAll { accent-color: var(--primary-color); cursor: pointer; width: 15px; height: 15px; }
-    .agents-modal.submitted .agents-body-blocker { }
+    /* Agents toolbar */
+    .agents-toolbar { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.85rem; }
+    .agents-selcount { font-size: 0.78rem; color: var(--primary-hover); font-weight: 700; background: rgba(99,102,241,0.08); padding: 0.25rem 0.65rem; border-radius: 999px; }
+    .agents-selcount:empty { display: none; }
+    .agents-status { margin-left: auto; font-size: 0.75rem; font-weight: 700; display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.28rem 0.7rem; border-radius: 999px; }
+    .agents-status:empty { display: none; }
+    .agents-status::before { font-family: "Font Awesome 6 Free"; font-weight: 900; font-size: 0.7rem; }
+    .agents-status:not(.submitted) { background: #fff7ed; color: #c2410c; }
+    .agents-status:not(.submitted)::before { content: "\f0e7"; }  /* unsaved */
+    .agents-status.saved { background: #ecfdf5; color: #047857; }
+    .agents-status.saved::before { content: "\f00c"; }
+    .agents-status.submitted { background: rgba(99,102,241,0.1); color: var(--primary-hover); }
+    .agents-status.submitted::before { content: "\f1d8"; }
+
+    /* Agents table — matches the main roster table look */
+    table.agents-table { font-size: 0.8rem; }
+    table.agents-table thead th { background: var(--bg-secondary); padding: 0.6rem 0.7rem; font-size: 0.64rem; }
+    table.agents-table tbody td { vertical-align: middle; padding: 0.5rem 0.7rem; }
+    table.agents-table tbody tr { transition: background 0.12s; }
+    table.agents-table tbody tr:hover { background: var(--bg-hover); }
+    table.agents-table tbody tr.row-selected { background: rgba(99,102,241,0.06); }
+    table.agents-table .emp-name-link { font-weight: 600; }
+    table.agents-table .num { font-weight: 600; color: var(--text-primary); }
+    table.agents-table select.cell-purpose { width: 100%; font-size: 0.76rem; padding: 0.4rem 0.5rem; border: 1px solid var(--border-color); border-radius: 0.45rem; font-family: inherit; background: #fff; color: var(--text-primary); cursor: pointer; transition: border-color 0.12s, box-shadow 0.12s; }
+    table.agents-table select.cell-purpose:hover { border-color: var(--primary-color); }
+    table.agents-table select.cell-purpose:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+    table.agents-table select.cell-purpose:invalid, table.agents-table select.cell-purpose option[value=""] { color: var(--text-muted); }
+    .bonus-cell { display: flex; align-items: center; gap: 0.4rem; }
+    .bonus-cell .cell-purpose { flex: 1 1 58%; min-width: 0; }
+    .bonus-cell .amt-wrap { flex: 1 1 42%; position: relative; min-width: 92px; }
+    .bonus-cell .cur-mini { position: absolute; left: 0.55rem; top: 50%; transform: translateY(-50%); font-size: 0.62rem; font-weight: 700; color: var(--text-muted); pointer-events: none; letter-spacing: 0.02em; z-index: 1; }
+    .bonus-cell input.cell-amt { width: 100%; box-sizing: border-box; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.5rem 0.4rem 2.7rem; border: 1px solid var(--border-color); border-radius: 0.45rem; font-family: inherit; text-align: right; font-variant-numeric: tabular-nums; transition: border-color 0.12s, box-shadow 0.12s; }
+    .bonus-cell input.cell-amt:hover { border-color: var(--primary-color); }
+    .bonus-cell input.cell-amt:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+    .bonus-cell input.cell-amt::placeholder { color: #cbd5e1; font-weight: 400; }
+    table.agents-table input[type=checkbox], #agentsSelAll { accent-color: var(--primary-color); cursor: pointer; width: 16px; height: 16px; }
+    table.agents-table td:first-child, table.agents-table th:first-child { text-align: center; }
     .agents-footer { gap: 0.5rem; }
+    .agents-empty-hint { color: var(--text-muted); font-size: 0.8rem; text-align: center; padding: 2rem; }
     .btn-badge { background: var(--primary-color); color:#fff; font-size:0.62rem; font-weight:700; padding:0.05rem 0.4rem; border-radius:999px; margin-left:0.15rem; }
     /* Agents' Bonuses full-screen view — covers the content area only (keeps sidebar + header) */
     .fullscreen-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--page-bg, #f8fafc); display: none; }
     .fullscreen-overlay.open { display: block; }
     .fullscreen-panel { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--page-bg, #f8fafc); min-width: 0; }
-    .fullscreen-panel .fs-header { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.75rem; background: #fff; border-bottom: 1px solid var(--border-color); }
-    .fullscreen-panel .fs-header h2 { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.55rem; }
+    .fullscreen-panel .fs-header { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.75rem; background: #fff; border-bottom: 1px solid var(--border-color); box-shadow: 0 1px 2px rgba(15,23,42,0.04); }
+    .fullscreen-panel .fs-header-titles { display: flex; flex-direction: column; gap: 0.15rem; border-left: 4px solid var(--primary-color); padding-left: 0.85rem; }
+    .fullscreen-panel .fs-title { margin: 0; font-size: 1.35rem; font-weight: 700; color: var(--text-primary); line-height: 1.1; }
+    .fullscreen-panel .fs-subtitle { font-size: 0.82rem; color: var(--text-secondary); }
+    .fullscreen-panel .fs-header .close-x { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 0.4rem; border-radius: 0.5rem; line-height: 1; transition: color 0.12s, background 0.12s; }
+    .fullscreen-panel .fs-header .close-x:hover { color: var(--text-primary); background: var(--bg-tertiary); }
     .fullscreen-panel .fs-body { flex: 1 1 auto; overflow: hidden; padding: 1.25rem 1.75rem 0; display: flex; flex-direction: column; min-height: 0; }
-    .fullscreen-panel .fs-footer { flex: 0 0 auto; display: flex; justify-content: flex-end; gap: 0.5rem; padding: 0.9rem 1.75rem; background: #fff; border-top: 1px solid var(--border-color); }
+    .fullscreen-panel .agents-banner { margin-bottom: 1rem; }
+    .fullscreen-panel .fs-footer { flex: 0 0 auto; display: flex; align-items: center; gap: 0.5rem; padding: 0.9rem 1.75rem; background: #fff; border-top: 1px solid var(--border-color); box-shadow: 0 -1px 2px rgba(15,23,42,0.04); }
+    .fullscreen-panel .fs-footer #agentsDiscard { margin-right: auto; }  /* destructive on the left */
     .fullscreen-panel .agents-toolbar { flex: 0 0 auto; }
-    .fullscreen-panel .agents-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; margin-bottom: 1.25rem; }
+    .fullscreen-panel .agents-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; margin-bottom: 1.25rem; background: #fff; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }
     /* When an action modal is opened to edit a pending request, it must sit above the Pending Requests modal */
     #raiseModal.editing-overlay, #additionModal.editing-overlay, #deductionModal.editing-overlay { z-index: 10005 !important; background: rgba(15,23,42,0.35); }
     </style>
@@ -509,9 +541,24 @@
 
             <!-- Agents' Bonuses full-screen view (covers the content area, keeps sidebar + header) -->
             <div class="fullscreen-overlay" id="agentsModal"><div class="fullscreen-panel agents-modal">
-                <div class="fs-header"><h2><i class="fas fa-people-group" style="color:#7c3aed;"></i> Agents' Bonuses</h2><button type="button" class="close-x" id="agentsClose" title="Discard &amp; exit"><i class="fas fa-times"></i></button></div>
+                <div class="fs-header">
+                    <div class="fs-header-titles">
+                        <h2 class="fs-title">Agents' Bonuses</h2>
+                        <span class="fs-subtitle">Add monthly bonuses for your agents in bulk</span>
+                    </div>
+                    <button type="button" class="close-x" id="agentsClose" title="Discard &amp; exit"><i class="fas fa-times"></i></button>
+                </div>
                 <div class="fs-body">
-                    <p class="modal-intro">Add monthly bonuses (overtime, incentive, commission, etc.) for your agents in bulk. Set an amount and purpose per agent, or select several agents and apply the same purpose at once. Amounts are rounded up to the nearest whole number.</p>
+                    <div class="roster-banner agents-banner">
+                        <i class="fas fa-people-group banner-icon"></i>
+                        <div class="banner-text">
+                            <div class="banner-title">Bulk bonus entry for agents</div>
+                            <div class="banner-note">
+                                <div>Set a <strong>purpose</strong> and <strong>amount</strong> for each agent, or select several agents and apply the same purpose at once with <strong>Set Bonus Purpose</strong>.</div>
+                                <div>Amounts are rounded up to the nearest whole number. Nothing is sent until you choose <strong>Save &amp; Submit to Payroll</strong>.</div>
+                            </div>
+                        </div>
+                    </div>
                     <div class="agents-toolbar">
                         <button type="button" class="btn btn-outline btn-sm" id="btnSetPurpose" disabled><i class="fas fa-tags"></i> Set Bonus Purpose</button>
                         <span class="agents-selcount" id="agentsSelCount"></span>
@@ -519,7 +566,7 @@
                     </div>
                     <div class="hist-table-wrap agents-wrap" id="agentsWrap">
                         <table class="hist-table agents-table" id="agentsTable">
-                            <colgroup><col style="width:4%"><col style="width:19%"><col style="width:13%"><col style="width:13%"><col style="width:12%"><col style="width:9%"><col style="width:10%"><col style="width:20%"></colgroup>
+                            <colgroup><col style="width:4%"><col style="width:17%"><col style="width:12%"><col style="width:12%"><col style="width:11%"><col style="width:9%"><col style="width:9%"><col style="width:26%"></colgroup>
                             <thead><tr>
                                 <th><input type="checkbox" id="agentsSelAll" title="Select all"></th>
                                 <th>Office Staff Name</th><th>Manager</th><th>Department</th><th>Job Title</th><th>Employee Type</th><th>Salary</th><th>Bonus</th>
@@ -1784,7 +1831,7 @@
             var tb=document.getElementById('agentsBody');
             if(!agentsState.rows.length){ tb.innerHTML='<tr><td colspan="8"><div class="hist-empty">No agents found in your team.</div></td></tr>'; return; }
             tb.innerHTML=agentsState.rows.map(function(a){
-                return '<tr>'
+                return '<tr'+(a.selected?' class="row-selected"':'')+'>'
                     +'<td><input type="checkbox" class="agent-sel" data-aid="'+a.id+'"'+(a.selected?' checked':'')+(agentsState.submitted?' disabled':'')+'></td>'
                     +'<td><a href="#" class="emp-name-link" data-history-id="'+a.id+'">'+esc(a.name)+'</a></td>'
                     +'<td>'+esc(a.manager)+'</td>'
@@ -1792,7 +1839,7 @@
                     +'<td>'+esc(a.title)+'</td>'
                     +'<td>'+typeBadge(a.empType)+'</td>'
                     +'<td class="num mask-amt">'+fmt(a.salary,a.cur)+'</td>'
-                    +'<td><div class="bonus-cell">'+purposeSelectHtml(a)+'<span class="cur-mini">'+esc(a.cur)+'</span><input type="number" min="0" step="1" class="cell-amt mask-amt" data-aid="'+a.id+'" value="'+(a.amount!==''?a.amount:'')+'" placeholder="0"'+(agentsState.submitted?' disabled':'')+'></div></td>'
+                    +'<td><div class="bonus-cell">'+purposeSelectHtml(a)+'<span class="amt-wrap"><span class="cur-mini">'+esc(a.cur)+'</span><input type="number" min="0" step="1" class="cell-amt mask-amt" data-aid="'+a.id+'" value="'+(a.amount!==''?a.amount:'')+'" placeholder="0"'+(agentsState.submitted?' disabled':'')+'></span></div></td>'
                     +'</tr>';
             }).join('');
             syncAgentsUI();
