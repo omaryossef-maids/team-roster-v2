@@ -1,0 +1,1907 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Roster - Maids.cc Access & Services</title>
+    <link rel="stylesheet" href="https://my.maidstech.ai/assets/css/style.css">
+    <link rel="stylesheet" href="https://my.maidstech.ai/assets/css/pages.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+    :root {
+        --primary-color: #6366f1; --primary-hover: #4f46e5;
+        --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #64748b;
+        --border-color: #e2e8f0; --bg-card: #ffffff; --bg-secondary: #f8fafc;
+        --bg-tertiary: #f3f4f6; --bg-hover: rgba(99,102,241,0.06); --page-bg: #f1f5f9;
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; color: var(--text-primary); background: var(--page-bg); }
+
+    .app-container { display: flex; height: 100vh; width: 100%; overflow: hidden; position: relative; }
+
+    /* ---------- Sidebar ---------- */
+    .sidebar { width: 260px; min-width: 260px; flex: 0 0 260px; position: relative !important; background: #fff; border-right: 1px solid var(--border-color); display: flex; flex-direction: column; height: 100vh; overflow-y: auto; margin: 0 !important; left: 0 !important; }
+    .sidebar-header { padding: 1.5rem 1.25rem; text-align: center; border-bottom: 1px solid var(--border-color); }
+    .sidebar-logo-img { max-width: 150px; height: auto; }
+    .sidebar-logo-text { display: block; font-weight: 700; color: var(--primary-color); margin-top: 0.5rem; font-size: 1rem; }
+    .sidebar-logo-fallback { font-size: 2rem; color: var(--primary-color); }
+    .sidebar-nav { padding: 0.75rem 0; }
+    .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.75rem 1.5rem; color: var(--text-secondary); text-decoration: none; font-size: 0.875rem; border-left: 3px solid transparent; transition: color 0.2s, background 0.2s; }
+    .nav-item i { width: 1.1rem; text-align: center; }
+    .nav-item:hover { color: var(--primary-color); background: var(--bg-hover); }
+    .nav-item.active { color: var(--primary-color); background: var(--bg-hover); border-left-color: var(--primary-color); font-weight: 600; }
+    .nav-item-top { font-size: 0.8125rem !important; font-weight: 500 !important; letter-spacing: 0.02em; }
+    .nav-collapsible-header { display: flex; align-items: center; padding: 0.75rem 1.5rem; color: var(--text-secondary); font-size: 0.8125rem; font-weight: 500; letter-spacing: 0.02em; cursor: pointer; transition: color 0.2s, background 0.2s; border-left: 3px solid transparent; user-select: none; gap: 0.5rem; }
+    .nav-collapsible-header:hover { color: var(--primary-color); background: var(--bg-hover); }
+    .nav-collapsible-header .nav-collapse-icon { margin-left: auto; font-size: 0.625rem; transition: transform 0.25s ease; }
+    .nav-collapsible.open > .nav-collapsible-header .nav-collapse-icon { transform: rotate(180deg); }
+    .nav-collapsible-body { overflow: hidden; max-height: 0; transition: max-height 0.3s ease; }
+    .nav-collapsible.open > .nav-collapsible-body { max-height: 500px; }
+    .nav-collapsible-body .nav-item { padding-left: 2.25rem; font-size: 0.875rem; }
+
+    /* ---------- Main / Header ---------- */
+    .main-content { flex: 1 1 auto; position: relative; min-width: 0; height: 100vh; display: flex; flex-direction: column; overflow: hidden; margin-left: 0 !important; width: auto !important; max-width: none !important; }
+    .header { flex-shrink: 0; display: flex; align-items: center; gap: 1rem; padding: 1rem 2rem; background: #fff; border-bottom: 1px solid var(--border-color); z-index: 30; }
+    .header-title::before { content: none !important; display: none !important; }
+    .header-title { font-size: 1.5rem; font-weight: 700; margin: 0; border-left: 4px solid var(--primary-color); padding-left: 0.75rem; }
+    .user-menu { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; }
+    .header-icon-btn { width: 36px; height: 36px; border-radius: 50%; background: #14b8a6; color: #fff; display: flex; align-items: center; justify-content: center; text-decoration: none; }
+    .user-dropdown-toggle { display: flex; align-items: center; gap: 0.5rem; background: none; border: 1px solid transparent; cursor: pointer; padding: 0.35rem 0.6rem; border-radius: 0.5rem; color: inherit; font-family: inherit; }
+    .user-dropdown-toggle:hover { background: var(--bg-hover); border-color: var(--border-color); }
+    .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--border-color); }
+    .user-name { font-weight: 600; font-size: 0.9rem; }
+    .dropdown-arrow { font-size: 0.6rem; color: var(--text-secondary); }
+
+    /* Scroll area: banner + filters scroll away, tabs stick, table fills the rest */
+    .page-scroll { flex: 1; overflow-y: auto; }
+    .content { padding: 1.25rem 2rem 1.25rem; width: 100%; max-width: none !important; margin: 0 !important; box-sizing: border-box; }
+    .fade-in { animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+    /* ---------- Buttons ---------- */
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; font-family: inherit; transition: all 0.15s; text-decoration: none; }
+    .btn-primary { background: var(--primary-color); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+    .btn-outline { background: #fff; color: var(--text-primary); border-color: var(--border-color); }
+    .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
+    .btn-sm { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
+
+    /* ---------- Info banner ---------- */
+    .roster-banner { display: flex; gap: 0.9rem; align-items: flex-start; background: linear-gradient(135deg, rgba(99,102,241,0.08), rgba(99,102,241,0.02)); border: 1px solid rgba(99,102,241,0.25); border-left: 4px solid var(--primary-color); border-radius: 0.75rem; padding: 0.9rem 1.1rem; margin-bottom: 1rem; }
+    .roster-banner .banner-icon { color: var(--primary-color); font-size: 1.15rem; margin-top: 0.1rem; flex-shrink: 0; }
+    .roster-banner .banner-text { font-size: 0.9rem; line-height: 1.5; color: var(--text-primary); }
+    .roster-banner .banner-title { font-weight: 700; }
+    .roster-banner .banner-title .mo { color: var(--primary-color); }
+    .roster-banner .banner-note { color: var(--text-secondary); margin-top: 0.2rem; display: flex; flex-direction: column; gap: 0.3rem; }
+    .roster-banner .deadline { background: #ecfdf5; color: #047857; padding: 0.05rem 0.4rem; border-radius: 0.35rem; font-weight: 600; white-space: nowrap; }
+    .roster-banner .deadline-late { background: #fff7ed; color: #c2410c; padding: 0.05rem 0.4rem; border-radius: 0.35rem; font-weight: 600; white-space: nowrap; }
+
+    /* ---------- Filters ---------- */
+    .filters-card { display: flex; gap: 1.25rem; flex-wrap: wrap; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0.75rem; padding: 1rem 1.1rem; margin-bottom: 1rem; }
+    .filters-primary { flex: 2 1 560px; min-width: 320px; }
+    .filters-additional { flex: 1 1 360px; min-width: 300px; border-left: 1px solid var(--border-color); padding-left: 1.25rem; }
+    .filters-section-label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.04em; font-weight: 700; color: var(--text-muted); margin-bottom: 0.6rem; }
+    .filters-row { display: flex; gap: 0.75rem; flex-wrap: wrap; }
+    .filter-field { display: flex; flex-direction: column; gap: 0.3rem; flex: 1 1 175px; min-width: 165px; }
+    .filter-field label { font-size: 0.72rem; font-weight: 600; color: var(--text-muted); }
+    .filter-control { padding: 0.5rem 0.7rem; border: 1px solid var(--border-color); border-radius: 0.5rem; font-size: 0.85rem; font-family: inherit; background: #fff; width: 100%; }
+    .filter-control:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+    .search-wrap { position: relative; }
+    .search-wrap > i { position: absolute; left: 0.7rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.8rem; }
+    .search-wrap .filter-control { padding-left: 2rem; }
+
+    /* Searchable select */
+    .ss { position: relative; }
+    .ss-trigger { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: 0.5rem 0.7rem; border: 1px solid var(--border-color); border-radius: 0.5rem; background: #fff; cursor: pointer; font-size: 0.85rem; font-family: inherit; min-height: 38px; text-align: left; color: var(--text-primary); }
+    .ss-trigger:hover { border-color: var(--primary-color); }
+    .ss.disabled .ss-trigger { background: var(--bg-tertiary); cursor: not-allowed; color: var(--text-secondary); }
+    .ss.disabled .ss-trigger:hover { border-color: var(--border-color); }
+    .ss-text { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .ss-text.placeholder { color: var(--text-muted); }
+    .ss-trigger > i { font-size: 0.6rem; color: var(--text-muted); margin-left: 0.5rem; transition: transform 0.2s; flex-shrink: 0; }
+    .ss.open .ss-trigger > i { transform: rotate(180deg); }
+    .ss-panel { display: none; position: absolute; left: 0; right: 0; top: calc(100% + 4px); background: #fff; border: 1px solid var(--border-color); border-radius: 0.5rem; box-shadow: 0 8px 24px rgba(0,0,0,0.12); z-index: 300; max-height: 250px; overflow: hidden; flex-direction: column; }
+    .ss.open .ss-panel { display: flex; }
+    .ss-search { padding: 0.5rem; border-bottom: 1px solid var(--border-color); position: relative; }
+    .ss-search > i { position: absolute; left: 0.9rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.72rem; }
+    .ss-search input { width: 100%; padding: 0.4rem 0.5rem 0.4rem 1.7rem; border: 1px solid var(--border-color); border-radius: 0.4rem; font-size: 0.82rem; outline: none; font-family: inherit; }
+    .ss-search input:focus { border-color: var(--primary-color); box-shadow: 0 0 0 2px rgba(99,102,241,0.12); }
+    .ss-options { overflow-y: auto; max-height: 195px; }
+    .ss-option { padding: 0.45rem 0.75rem; font-size: 0.83rem; cursor: pointer; }
+    .ss-option:hover { background: var(--bg-tertiary); }
+    .ss-option.selected { background: rgba(99,102,241,0.1); color: var(--primary-color); font-weight: 600; }
+    .ss-option.none { color: var(--text-muted); text-align: center; cursor: default; }
+
+    .chk-chips { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+    .chk-chip { display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.4rem 0.7rem; border: 1px solid var(--border-color); border-radius: 999px; font-size: 0.78rem; cursor: pointer; user-select: none; transition: all 0.15s; background: #fff; color: var(--text-secondary); }
+    .chk-chip:hover { border-color: var(--primary-color); color: var(--primary-color); }
+    .chk-chip.checked { background: var(--primary-color); border-color: var(--primary-color); color: #fff; }
+    .chk-chip .fa-check { display: none; font-size: 0.65rem; }
+    .chk-chip.checked .fa-check { display: inline; }
+
+    /* ---------- Sticky tabs ---------- */
+    .roster-tabs { position: sticky; top: 0; z-index: 25; display: flex; gap: 0.25rem; border-bottom: 2px solid var(--border-color); background: var(--page-bg); padding-top: 0.25rem; margin: 0; flex-wrap: wrap; }
+    .roster-tab { padding: 0.7rem 1.3rem; background: none; border: none; cursor: pointer; font-size: 0.9rem; font-weight: 600; color: var(--text-muted); border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: inherit; display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.15s; }
+    .roster-tab:hover { color: var(--primary-color); }
+    .roster-tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+    .roster-tab .tab-count { background: var(--bg-tertiary); color: var(--text-secondary); font-size: 0.7rem; font-weight: 700; padding: 0.05rem 0.45rem; border-radius: 999px; }
+    .roster-tab.active .tab-count { background: var(--primary-color); color: #fff; }
+
+    /* ---------- Toolbar ---------- */
+    .roster-toolbar { display: flex; align-items: center; gap: 1rem; padding: 0.75rem 0; }
+    .row-count { font-size: 0.85rem; font-weight: 600; color: var(--text-secondary); }
+    .row-count strong { color: var(--text-primary); }
+    .cols-wrap { position: relative; margin-left: auto; }
+    .cols-panel { display: none; position: absolute; right: 0; top: calc(100% + 6px); width: 280px; z-index: 200; background: #fff; border: 1px solid var(--border-color); border-radius: 0.6rem; box-shadow: 0 8px 24px rgba(0,0,0,0.12); padding: 0.6rem; }
+    .cols-wrap.open .cols-panel { display: block; }
+    .cols-panel-title { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; font-weight: 700; color: var(--text-muted); padding: 0.25rem 0.4rem 0.5rem; }
+    .col-opt { display: flex; align-items: center; gap: 0.55rem; padding: 0.4rem 0.45rem; border-radius: 0.4rem; cursor: pointer; font-size: 0.84rem; }
+    .col-opt:hover { background: var(--bg-tertiary); }
+    .col-opt input { accent-color: var(--primary-color); cursor: pointer; }
+    .cols-panel-footer { border-top: 1px solid var(--border-color); margin-top: 0.5rem; padding-top: 0.6rem; display: flex; align-items: center; gap: 0.5rem; }
+    .cols-saved-msg { font-size: 0.75rem; color: #047857; display: none; }
+    .cols-saved-msg.show { display: inline; }
+
+    /* ---------- Table ---------- */
+    .roster-table-wrap { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0.75rem; overflow-y: auto; overflow-x: hidden; }
+    .roster-table-wrap.scroll { overflow-x: auto; }
+    table.roster-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 0.82rem; }
+    .roster-table-wrap.scroll table.roster-table { width: auto; min-width: 100%; }
+    table.roster-table thead th { text-align: left; padding: 0.7rem 0.65rem; background: var(--bg-tertiary); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.02em; color: var(--text-muted); font-weight: 700; position: sticky; top: 0; z-index: 3; border-bottom: 1px solid var(--border-color); }
+    table.roster-table tbody td { padding: 0.7rem 0.65rem; border-bottom: 1px solid var(--border-color); vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; background: #fff; }
+    table.roster-table tbody tr:hover td { background: var(--bg-secondary); }
+    table.roster-table tbody tr:last-child td { border-bottom: none; }
+    .roster-table-wrap.scroll table.roster-table td, .roster-table-wrap.scroll table.roster-table th { white-space: nowrap; }
+    .roster-table-wrap.scroll table.roster-table td.wrap, .roster-table-wrap.scroll table.roster-table th.wrap { white-space: normal; }
+    .roster-table-wrap.scroll thead th.col-name { position: sticky; left: 0; z-index: 4; }
+    .roster-table-wrap.scroll tbody td.col-name { position: sticky; left: 0; z-index: 2; box-shadow: 1px 0 0 var(--border-color); }
+    .roster-table-wrap.scroll tbody tr:hover td.col-name { background: var(--bg-secondary); }
+
+    .cell-name { font-weight: 600; }
+    .jt-main { font-weight: 700; font-size: 0.86rem; display: block; }
+    .jt-spec { color: var(--text-muted); font-size: 0.74rem; display: block; }
+    .num { font-variant-numeric: tabular-nums; }
+    .num-pos { color: #059669; font-weight: 600; }
+    .num-neg { color: #dc2626; font-weight: 600; }
+    .num-zero { color: var(--text-muted); }
+    .net-salary { font-weight: 700; color: var(--text-primary); }
+    .item-line { display: block; line-height: 1.4; margin-bottom: 0.15rem; }
+    .item-line:last-child { margin-bottom: 0; }
+    .item-line .amt { font-weight: 600; }
+    .reason { color: var(--text-muted); }
+    .badge { display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.12rem 0.55rem; border-radius: 999px; font-size: 0.7rem; font-weight: 600; white-space: nowrap; }
+    .b-active { background: #dcfce7; color: #166534; }
+    .b-terminated { background: #fee2e2; color: #991b1b; }
+    .b-onhold-yes { background: #fef3c7; color: #92400e; }
+    .b-onhold-no { background: #f1f5f9; color: #475569; }
+    .b-type-emirati { background: #ede9fe; color: #5b21b6; }
+    .b-type-overseas { background: #e0f2fe; color: #075985; }
+    .b-type-expat { background: #fef9c3; color: #854d0e; }
+    .sub-note { color: var(--text-muted); font-size: 0.72rem; display: block; margin-top: 0.15rem; }
+
+    .cell-actions { text-align: center; }
+    .action-menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 30px; font-size: 0.9rem; background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; cursor: pointer; transition: all 0.15s; }
+    .action-menu-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+    .action-menu-btn.active { border-color: var(--primary-color); color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
+
+    .floating-menu { display: none; position: fixed; min-width: 190px; background: #fff; border: 1px solid var(--border-color); border-radius: 0.5rem; box-shadow: 0 8px 24px rgba(0,0,0,0.16); z-index: 9998; padding: 0.25rem 0; }
+    .floating-menu.open { display: block; }
+    .floating-menu button { display: flex; align-items: center; gap: 0.625rem; width: 100%; padding: 0.55rem 0.9rem; font-size: 0.82rem; background: none; border: none; cursor: pointer; color: var(--text-primary); text-align: left; font-family: inherit; transition: background 0.12s; white-space: nowrap; }
+    .floating-menu button:hover { background: var(--bg-tertiary); }
+    .floating-menu button i { width: 1rem; text-align: center; }
+    .floating-menu .ic-raise { color: #059669; }
+    .floating-menu .ic-add { color: #7c3aed; }
+    .floating-menu .ic-ded { color: #dc2626; }
+
+    .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9999; align-items: center; justify-content: center; padding: 1rem; }
+    .modal-overlay.open { display: flex; }
+    .modal { background: var(--bg-card); border-radius: 0.75rem; width: 100%; max-width: 440px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25); overflow: hidden; animation: fadeIn 0.2s ease; }
+    .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 1px solid var(--border-color); }
+    .modal-header h3 { margin: 0; font-size: 1rem; }
+    .modal-header .close-x { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.1rem; padding: 0.25rem; }
+    .modal-header .close-x:hover { color: var(--text-primary); }
+    .modal-emp { padding: 0.7rem 1.25rem; background: var(--bg-secondary); border-bottom: 1px solid var(--border-color); font-size: 0.8rem; color: var(--text-secondary); }
+    .modal-emp strong { color: var(--text-primary); }
+    .modal-body { padding: 1.25rem; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group:last-child { margin-bottom: 0; }
+    .form-group label { display: block; font-size: 0.825rem; font-weight: 600; margin-bottom: 0.375rem; }
+    .form-group label .req { color: #ef4444; }
+    .form-control { width: 100%; padding: 0.55rem 0.75rem; border: 1px solid var(--border-color); border-radius: 0.5rem; font-size: 0.875rem; font-family: inherit; box-sizing: border-box; background: #fff; }
+    .form-control:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
+    textarea.form-control { resize: vertical; min-height: 70px; }
+    .input-prefixed { position: relative; }
+    .input-prefixed .cur { position: absolute; left: 0.75rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 0.825rem; font-weight: 600; pointer-events: none; }
+    .input-prefixed .form-control { padding-left: 2.6rem; }
+    .modal-footer { padding: 1rem 1.25rem; border-top: 1px solid var(--border-color); display: flex; gap: 0.5rem; justify-content: flex-end; }
+
+    .empty-state { padding: 3rem; text-align: center; color: var(--text-muted); }
+    .empty-state i { font-size: 2rem; opacity: 0.5; display: block; margin-bottom: 0.75rem; }
+
+    @media (max-width: 768px) {
+        .content { padding: 1rem 1rem 0; }
+        .header { padding: 0.75rem 1rem; }
+        .header-title { font-size: 1.15rem; }
+        .filters-additional { border-left: none; padding-left: 0; }
+    }
+
+    /* ---- Salary-change modals + toasts ---- */
+    .modal.modal-lg { max-width: 520px; }
+    .modal-err { display: none; background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; padding: 0.6rem 0.8rem; border-radius: 0.5rem; font-size: 0.82rem; margin-bottom: 0.9rem; }
+    .modal-err.show { display: block; }
+    .ro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.6rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.6rem; padding: 0.8rem; margin-bottom: 1rem; }
+    .ro { display: flex; flex-direction: column; gap: 0.15rem; }
+    .ro-l { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); font-weight: 700; }
+    .ro-v { font-size: 0.9rem; font-weight: 600; color: var(--text-primary); }
+    .ro-v.ro-accent { color: var(--primary-color); }
+    .field-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.3rem; }
+    .modal-footer-demo { flex-wrap: wrap; }
+    .modal-footer-demo .demo-hint { margin-right: auto; font-size: 0.72rem; color: var(--text-muted); align-self: center; display: inline-flex; align-items: center; gap: 0.35rem; }
+    .btn.btn-alt { background: #0ea5e9; color: #fff; }
+    .btn.btn-alt:hover { background: #0284c7; }
+    .toast-wrap { position: fixed; top: 1rem; left: 50%; transform: translateX(-50%); z-index: 10001; display: flex; flex-direction: column; gap: 0.5rem; width: min(460px, calc(100vw - 2rem)); }
+    .toast { display: flex; align-items: flex-start; gap: 0.6rem; padding: 0.75rem 0.9rem; border-radius: 0.6rem; box-shadow: 0 10px 30px rgba(0,0,0,0.15); font-size: 0.85rem; background: #fff; border: 1px solid var(--border-color); animation: toastIn 0.25s ease; }
+    .toast .ti { font-size: 1rem; margin-top: 0.05rem; flex-shrink: 0; }
+    .toast .tx { flex: 1; line-height: 1.45; }
+    .toast .tx b { font-weight: 700; }
+    .toast .tc { background: none; border: none; cursor: pointer; color: inherit; opacity: 0.55; font-size: 0.85rem; padding: 0; }
+    .toast .tc:hover { opacity: 1; }
+    .toast.success { background: #ecfdf5; border-color: #a7f3d0; color: #065f46; }
+    .toast.success .ti { color: #059669; }
+    .toast.info { background: #eff6ff; border-color: #bfdbfe; color: #1e40af; }
+    .toast.info .ti { color: #2563eb; }
+    .toast.neutral { background: #f8fafc; border-color: #e2e8f0; color: #475569; }
+    .toast.neutral .ti { color: #64748b; }
+    @keyframes toastIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+    /* ---- Force our dialogs visible regardless of external modal CSS ---- */
+    .modal-overlay { position: fixed !important; inset: 0 !important; z-index: 9999 !important; }
+    .modal-overlay:not(.open) { display: none !important; }
+    .modal-overlay.open { display: flex !important; align-items: center !important; justify-content: center !important; }
+    .modal-overlay > .modal { display: flex !important; flex-direction: column !important; position: relative !important; inset: auto !important; top: auto !important; left: auto !important; right: auto !important; bottom: auto !important; opacity: 1 !important; visibility: visible !important; transform: none !important; width: 100% !important; height: auto !important; min-height: 0 !important; max-height: 90vh; overflow: auto; }
+    .modal-footer-stack { flex-direction: column; align-items: stretch; gap: 0.6rem; }
+    .modal-footer-stack .mf-row { display: flex; gap: 0.5rem; justify-content: flex-end; }
+    .emp-name-link { color: #3b82f6; text-decoration: none; cursor: pointer; font-weight: 600; }
+    .emp-name-link:hover { color: #2563eb; }
+    /* History modal */
+    .modal.modal-history { max-width: 860px; }
+    .hist-section-title { font-size: 0.8rem; font-weight: 700; color: var(--text-primary); margin: 1.1rem 0 0.5rem; display: flex; align-items: center; gap: 0.45rem; }
+    .hist-section-title i { color: var(--primary-color); }
+    .hist-prevnet { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.6rem; padding: 0.7rem 0.95rem; }
+    .hist-prevnet .l { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.03em; color: var(--text-muted); font-weight: 700; }
+    .hist-prevnet .v { font-size: 1.05rem; font-weight: 700; color: var(--primary-color); }
+    .hist-table-wrap { border: 1px solid var(--border-color); border-radius: 0.6rem; overflow-y: auto; overflow-x: hidden; }
+    table.hist-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 0.76rem; table-layout: fixed; }
+    table.hist-table thead th { position: sticky; top: 0; z-index: 2; background: var(--bg-tertiary); text-align: left; padding: 0.55rem 0.6rem; font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.02em; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid var(--border-color); }
+    table.hist-table tbody td { padding: 0.55rem 0.6rem; border-bottom: 1px solid var(--border-color); vertical-align: top; word-wrap: break-word; overflow-wrap: break-word; }
+    table.hist-table tbody tr:last-child td { border-bottom: none; }
+    .hist-empty { padding: 1.4rem; text-align: center; color: var(--text-muted); font-size: 0.8rem; }
+    .ht-type { font-weight: 600; white-space: nowrap; }
+    .badge-approved { background: #dcfce7; color: #166534; }
+    .badge-pending { background: #fef3c7; color: #92400e; }
+    .ht-amt { font-variant-numeric: tabular-nums; white-space: nowrap; }
+    /* Confirm (duplicate) modal */
+    .modal.modal-confirm { max-width: 460px; }
+    .confirm-body { font-size: 0.875rem; line-height: 1.5; color: var(--text-primary); }
+    .confirm-body .cb-reason { margin-top: 0.5rem; color: var(--text-secondary); }
+    .confirm-body .cb-q { margin-top: 0.75rem; font-weight: 600; }
+    .cols-bulk { display: inline-flex; gap: 0.4rem; }
+    .cols-bulk-btn { background: none; border: none; font-family: inherit; font-size: 0.7rem; font-weight: 700; text-transform: none; letter-spacing: 0; color: var(--primary-color); cursor: pointer; padding: 0.1rem 0.25rem; border-radius: 0.3rem; }
+    .cols-bulk-btn:hover:not(:disabled) { background: var(--bg-tertiary); }
+    .cols-bulk-btn:disabled { color: #cbd5e1; cursor: default; }
+    .modal-footer-fm { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 0.6rem; }
+    .modal-footer-fm .fm-demo-actions { display: inline-flex; gap: 0.5rem; margin-left: auto; }
+    .fm-demo-toggle { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.74rem; color: var(--text-muted); cursor: pointer; user-select: none; }
+    .fm-demo-toggle input { accent-color: var(--primary-color); cursor: pointer; }
+    .fm-demo-toggle i { color: var(--primary-color); font-size: 0.72rem; }
+    .cur-note { background: #fffbeb; border: 1px solid #fde68a; color: #92400e; font-size: 0.78rem; line-height: 1.4; border-radius: 0.5rem; padding: 0.55rem 0.7rem; margin-bottom: 0.6rem; }
+    .conv-toggle { display: flex; align-items: center; gap: 0.45rem; font-size: 0.8rem; color: var(--text-secondary); cursor: pointer; user-select: none; margin: -0.1rem 0 0.7rem; }
+    .conv-toggle input { accent-color: var(--primary-color); cursor: pointer; }
+    .conv-toggle i { color: var(--primary-color); font-size: 0.74rem; }
+    .round-note { color: var(--text-muted); font-size: 0.7rem; margin-top: 0.25rem; }
+    .form-control[readonly] { background: var(--bg-secondary); color: var(--text-secondary); cursor: not-allowed; }
+    .pending-item { opacity: 0.9; }
+    .pending-item .amt, .pending-item .reason { font-style: italic; color: #94a3b8 !important; font-weight: 500; }
+    .pending-item .reason { font-size: 0.72rem; }
+    .modal.modal-wide { max-width: 1000px; }
+    .modal-intro { font-size: 0.82rem; color: var(--text-secondary); margin: 0 0 0.75rem; line-height: 1.5; }
+    .roster-tab.tab-action { margin-left: 0.25rem; }
+    .pend-act-btn { border: 1px solid var(--border-color); background: #fff; color: var(--text-secondary); border-radius: 0.4rem; padding: 0.28rem 0.55rem; font-size: 0.72rem; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 0.3rem; font-family: inherit; }
+    .pend-act-btn:hover { background: var(--bg-tertiary); }
+    .pend-act-btn.danger { color: #dc2626; border-color: #fecaca; }
+    .pend-act-btn.danger:hover { background: #fef2f2; }
+    .pend-act-btn.edit { color: var(--primary-color); border-color: #c7d2fe; }
+    .pend-act-btn.edit:hover { background: #eef2ff; }
+    .btn-danger { background: #dc2626; color: #fff; border: 1px solid #dc2626; }
+    .btn-danger:hover { background: #b91c1c; }
+    .danger-note { background: #fef2f2; border: 1px solid #fecaca; color: #991b1b; font-size: 0.78rem; border-radius: 0.5rem; padding: 0.55rem 0.7rem; margin-bottom: 0.7rem; line-height: 1.4; }
+    .del-summary { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; padding: 0.6rem 0.75rem; font-size: 0.8rem; margin-bottom: 0.7rem; line-height: 1.6; }
+    .del-summary b { color: var(--text-primary); }
+    .opt { color: var(--text-muted); font-weight: 400; font-size: 0.75rem; }
+    .edit-footer { display: none; justify-content: flex-end; gap: 0.5rem; }
+    .modal.edit-mode .add-footer { display: none; }
+    .modal.edit-mode .edit-footer { display: flex; }
+    .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+    .agents-toolbar { display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.6rem; }
+    .agents-selcount { font-size: 0.78rem; color: var(--text-secondary); font-weight: 600; }
+    .agents-status { margin-left: auto; font-size: 0.8rem; font-weight: 700; }
+    .agents-status.saved { color: #059669; }
+    .agents-status.submitted { color: var(--primary-color); }
+    table.agents-table tbody td { vertical-align: middle; }
+    table.agents-table select.cell-purpose { width: 100%; font-size: 0.74rem; padding: 0.3rem 0.4rem; border: 1px solid var(--border-color); border-radius: 0.35rem; font-family: inherit; background:#fff; }
+    .bonus-cell { display: flex; align-items: center; gap: 0.35rem; }
+    .bonus-cell .cur-mini { font-size: 0.62rem; font-weight: 700; color: var(--text-muted); background: var(--bg-tertiary); padding: 0.1rem 0.3rem; border-radius: 0.3rem; }
+    .bonus-cell input.cell-amt { width: 100%; font-size: 0.76rem; padding: 0.3rem 0.4rem; border: 1px solid var(--border-color); border-radius: 0.35rem; font-family: inherit; text-align: right; }
+    table.agents-table input[type=checkbox], #agentsSelAll { accent-color: var(--primary-color); cursor: pointer; width: 15px; height: 15px; }
+    .agents-modal.submitted .agents-body-blocker { }
+    .agents-footer { gap: 0.5rem; }
+    .btn-badge { background: var(--primary-color); color:#fff; font-size:0.62rem; font-weight:700; padding:0.05rem 0.4rem; border-radius:999px; margin-left:0.15rem; }
+    /* Agents' Bonuses full-screen view — covers the content area only (keeps sidebar + header) */
+    .fullscreen-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 60; background: var(--page-bg, #f8fafc); display: none; }
+    .fullscreen-overlay.open { display: block; }
+    .fullscreen-panel { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--page-bg, #f8fafc); min-width: 0; }
+    .fullscreen-panel .fs-header { flex: 0 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 1.1rem 1.75rem; background: #fff; border-bottom: 1px solid var(--border-color); }
+    .fullscreen-panel .fs-header h2 { margin: 0; font-size: 1.15rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.55rem; }
+    .fullscreen-panel .fs-body { flex: 1 1 auto; overflow: hidden; padding: 1.25rem 1.75rem 0; display: flex; flex-direction: column; min-height: 0; }
+    .fullscreen-panel .fs-footer { flex: 0 0 auto; display: flex; justify-content: flex-end; gap: 0.5rem; padding: 0.9rem 1.75rem; background: #fff; border-top: 1px solid var(--border-color); }
+    .fullscreen-panel .agents-toolbar { flex: 0 0 auto; }
+    .fullscreen-panel .agents-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; margin-bottom: 1.25rem; }
+    /* When an action modal is opened to edit a pending request, it must sit above the Pending Requests modal */
+    #raiseModal.editing-overlay, #additionModal.editing-overlay, #deductionModal.editing-overlay { z-index: 10005 !important; background: rgba(15,23,42,0.35); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <img src="https://my.maidstech.ai/assets/img/logo.png" alt="Maids.cc Access & Services" class="sidebar-logo-img" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                <div class="sidebar-logo-fallback" style="display:none;"><i class="fas fa-headset"></i></div>
+                <span class="sidebar-logo-text">Maids.cc Access &amp; Services</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="https://my.maidstech.ai/user_dashboard.php" class="nav-item nav-item-top"><i class="fas fa-home"></i> My Directory</a>
+                <a href="https://my.maidstech.ai/apps_directory.php" class="nav-item nav-item-top"><i class="fas fa-th"></i> Apps Directory</a>
+                <div class="nav-collapsible open">
+                    <div class="nav-collapsible-header"><i class="fas fa-users-cog"></i> Team Management <i class="fas fa-chevron-down nav-collapse-icon"></i></div>
+                    <div class="nav-collapsible-body">
+                        <a href="https://my.maidstech.ai/manager_dashboard.php" class="nav-item"><i class="fas fa-tachometer-alt"></i> Manager Dashboard</a>
+                        <a href="https://my.maidstech.ai/team_roster.php" class="nav-item active"><i class="fas fa-clipboard-list"></i> Team Roster</a>
+                        <a href="https://my.maidstech.ai/manager_guide.php" class="nav-item"><i class="fas fa-book-open"></i> Manager's Guide</a>
+                    </div>
+                </div>
+                <div class="nav-collapsible">
+                    <div class="nav-collapsible-header"><i class="fas fa-bolt"></i> My Activity <i class="fas fa-chevron-down nav-collapse-icon"></i></div>
+                    <div class="nav-collapsible-body">
+                        <a href="https://my.maidstech.ai/my_tasks.php" class="nav-item"><i class="fas fa-tasks"></i> My Tasks</a>
+                        <a href="https://my.maidstech.ai/my_requests.php" class="nav-item"><i class="fas fa-paper-plane"></i> My Requests</a>
+                    </div>
+                </div>
+                <div class="nav-collapsible">
+                    <div class="nav-collapsible-header"><i class="fas fa-briefcase"></i> My Resources <i class="fas fa-chevron-down nav-collapse-icon"></i></div>
+                    <div class="nav-collapsible-body">
+                        <a href="https://my.maidstech.ai/my_accesses.php" class="nav-item"><i class="fas fa-key"></i> My Accesses</a>
+                        <a href="https://my.maidstech.ai/my_assets.php" class="nav-item"><i class="fas fa-crown"></i> My Assets</a>
+                        <a href="https://my.maidstech.ai/my_buckets.php" class="nav-item"><i class="fas fa-piggy-bank"></i> My Buckets</a>
+                        <a href="https://my.maidstech.ai/my_keys.php" class="nav-item"><i class="fas fa-key"></i> My Keys</a>
+                        <a href="https://my.maidstech.ai/my_security.php" class="nav-item"><i class="fas fa-shield-virus"></i> My Security</a>
+                        <a href="https://my.maidstech.ai/my_referrals.php" class="nav-item"><i class="fas fa-user-friends"></i> My Referrals</a>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="header">
+                <h1 class="header-title">Team Roster</h1>
+                <div class="user-menu">
+                    <a href="https://org.maidstech.ai/org-chart" target="_blank" rel="noopener noreferrer" class="header-icon-btn" title="Org Chart"><i class="fas fa-sitemap"></i></a>
+                    <button type="button" class="user-dropdown-toggle">
+                        <img src="https://erpbackendpro.maids.cc/public/download/8c7e66d2-7d3b-4464-856d-2e9e27ffae8f" alt="User Avatar" class="user-avatar" onerror="this.style.display='none'">
+                        <span class="user-name">Omar Yossef</span>
+                        <i class="fas fa-chevron-down dropdown-arrow"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-scroll" id="pageScroll">
+                <div class="content fade-in roster-page">
+                    <!-- Info banner -->
+                    <div class="roster-banner">
+                        <i class="fas fa-circle-info banner-icon"></i>
+                        <div class="banner-text">
+                            <span class="banner-title">Your Team's Roster for <span class="mo">June 2026</span> Payroll</span>
+                            <div class="banner-note">
+                                <div>Update your team's salaries from this page.</div>
+                                <div>You can request a change at any time. It will be applied to the <strong>June 2026</strong> salary as long as the final manager approves it before the payroll payment day.</div>
+                                <div>To ensure your changes are applied to the <strong>June 2026</strong> salary, we recommend submitting them by:</div>
+                                <div><strong>For Emiratis:</strong> <span class="deadline">June 25, 11:59 PM</span></div>
+                                <div><strong>For Overseas &amp; Expats:</strong> <span class="deadline">June 26, 11:59 PM</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-card">
+                        <div class="filters-primary">
+                            <div class="filters-section-label" style="display:flex;align-items:center;justify-content:space-between;">
+                                <span>Filters</span>
+                                <button type="button" class="btn btn-outline btn-sm" id="btnResetFilters" style="text-transform:none;letter-spacing:0;font-weight:600;"><i class="fas fa-rotate-left"></i> Reset Filters</button>
+                            </div>
+                            <div class="filters-row">
+                                <div class="filter-field">
+                                    <label>Search for employee</label>
+                                    <div class="search-wrap"><i class="fas fa-search"></i><input type="text" id="fSearch" class="filter-control" placeholder="Search for employee by name..."></div>
+                                </div>
+                                <div class="filter-field">
+                                    <label>Manager</label>
+                                    <div class="ss" id="ssManager">
+                                        <button type="button" class="ss-trigger"><span class="ss-text placeholder">All managers</span><i class="fas fa-chevron-down"></i></button>
+                                        <div class="ss-panel"><div class="ss-search"><i class="fas fa-search"></i><input type="text" placeholder="Search..."></div><div class="ss-options"></div></div>
+                                    </div>
+                                </div>
+                                <div class="filter-field">
+                                    <label>Roster Manager</label>
+                                    <div class="ss" id="ssRosterMgr">
+                                        <button type="button" class="ss-trigger"><span class="ss-text placeholder">All roster managers</span><i class="fas fa-chevron-down"></i></button>
+                                        <div class="ss-panel"><div class="ss-search"><i class="fas fa-search"></i><input type="text" placeholder="Search..."></div><div class="ss-options"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="filters-row" style="margin-top:0.75rem;">
+                                <div class="filter-field" style="flex:1 1 0;min-width:0;">
+                                    <label>Department</label>
+                                    <div class="ss" id="ssDept">
+                                        <button type="button" class="ss-trigger"><span class="ss-text placeholder">All departments</span><i class="fas fa-chevron-down"></i></button>
+                                        <div class="ss-panel"><div class="ss-search"><i class="fas fa-search"></i><input type="text" placeholder="Search..."></div><div class="ss-options"></div></div>
+                                    </div>
+                                </div>
+                                <div class="filter-field" style="flex:1 1 0;min-width:0;">
+                                    <label>Job Title</label>
+                                    <div class="ss" id="ssTitle">
+                                        <button type="button" class="ss-trigger"><span class="ss-text placeholder">All job titles</span><i class="fas fa-chevron-down"></i></button>
+                                        <div class="ss-panel"><div class="ss-search"><i class="fas fa-search"></i><input type="text" placeholder="Search..."></div><div class="ss-options"></div></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="filters-additional">
+                            <div class="filters-section-label">Additional filters</div>
+                            <div class="chk-chips" id="addlFilters"></div>
+                        </div>
+                    </div>
+
+                    <!-- Sticky Tabs -->
+                    <div class="roster-tabs" id="tabsBar" role="tablist">
+                        <button type="button" class="roster-tab active" data-tab="all" role="tab"><i class="fas fa-layer-group"></i> All <span class="tab-count" data-count="all">0</span></button>
+                        <button type="button" class="roster-tab" data-tab="emiratis" role="tab"><i class="fas fa-id-badge"></i> Emiratis <span class="tab-count" data-count="emiratis">0</span></button>
+                        <button type="button" class="roster-tab" data-tab="overseas" role="tab"><i class="fas fa-globe"></i> Overseas <span class="tab-count" data-count="overseas">0</span></button>
+                        <button type="button" class="roster-tab" data-tab="expats" role="tab"><i class="fas fa-passport"></i> Expats <span class="tab-count" data-count="expats">0</span></button>
+                    </div>
+
+                    <!-- Toolbar -->
+                    <div class="roster-toolbar" id="toolbar">
+                        <span class="row-count" id="rowCount">0 employees</span>
+                        <button type="button" class="btn btn-outline btn-sm" id="btnPending"><i class="fas fa-hourglass-half"></i> Pending Requests <span class="btn-badge" id="pendingCount">0</span></button>
+                        <button type="button" class="btn btn-outline btn-sm" id="btnAgents"><i class="fas fa-people-group"></i> Agents' Bonuses</button>
+                        <div class="cols-wrap" id="colsWrap">
+                            <button type="button" class="btn btn-outline btn-sm" id="btnCols"><i class="fas fa-table-columns"></i> Show additional columns <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></button>
+                            <div class="cols-panel">
+                                <div class="cols-panel-title" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
+                                    <span>Additional columns</span>
+                                    <span class="cols-bulk">
+                                        <button type="button" class="cols-bulk-btn" id="btnColsSelectAll">Select All</button>
+                                        <button type="button" class="cols-bulk-btn" id="btnColsClear">Clear</button>
+                                    </span>
+                                </div>
+                                <div id="colOptions"></div>
+                                <div class="cols-panel-footer">
+                                    <button type="button" class="btn btn-primary btn-sm" id="btnSaveView"><i class="fas fa-floppy-disk"></i> Save as default view</button>
+                                    <span class="cols-saved-msg" id="savedMsg"><i class="fas fa-check"></i> Saved</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="rosterPanel"></div>
+                </div>
+            </div>
+
+            <!-- Agents' Bonuses full-screen view (covers the content area, keeps sidebar + header) -->
+            <div class="fullscreen-overlay" id="agentsModal"><div class="fullscreen-panel agents-modal">
+                <div class="fs-header"><h2><i class="fas fa-people-group" style="color:#7c3aed;"></i> Agents' Bonuses</h2><button type="button" class="close-x" id="agentsClose" title="Discard &amp; exit"><i class="fas fa-times"></i></button></div>
+                <div class="fs-body">
+                    <p class="modal-intro">Add monthly bonuses (overtime, incentive, commission, etc.) for your agents in bulk. Set an amount and purpose per agent, or select several agents and apply the same purpose at once. Amounts are rounded up to the nearest whole number.</p>
+                    <div class="agents-toolbar">
+                        <button type="button" class="btn btn-outline btn-sm" id="btnSetPurpose" disabled><i class="fas fa-tags"></i> Set Bonus Purpose</button>
+                        <span class="agents-selcount" id="agentsSelCount"></span>
+                        <span class="agents-status" id="agentsStatus"></span>
+                    </div>
+                    <div class="hist-table-wrap agents-wrap" id="agentsWrap">
+                        <table class="hist-table agents-table" id="agentsTable">
+                            <colgroup><col style="width:4%"><col style="width:19%"><col style="width:13%"><col style="width:13%"><col style="width:12%"><col style="width:9%"><col style="width:10%"><col style="width:20%"></colgroup>
+                            <thead><tr>
+                                <th><input type="checkbox" id="agentsSelAll" title="Select all"></th>
+                                <th>Office Staff Name</th><th>Manager</th><th>Department</th><th>Job Title</th><th>Employee Type</th><th>Salary</th><th>Bonus</th>
+                            </tr></thead>
+                            <tbody id="agentsBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="fs-footer">
+                    <button type="button" class="btn btn-outline" id="agentsDiscard"><i class="fas fa-xmark"></i> Discard &amp; Exit</button>
+                    <button type="button" class="btn btn-outline" id="agentsSave" disabled><i class="fas fa-floppy-disk"></i> Save without Submitting</button>
+                    <button type="button" class="btn btn-primary" id="agentsSubmit"><i class="fas fa-paper-plane"></i> Save &amp; Submit to Payroll</button>
+                </div>
+            </div></div>
+        </main>
+    </div>
+
+    <!-- Floating action menu -->
+    <div class="floating-menu" id="floatMenu">
+        <button type="button" data-act="raise"><i class="fas fa-arrow-trend-up ic-raise"></i> Add Salary Raise</button>
+        <button type="button" data-act="bonus"><i class="fas fa-plus-circle ic-add"></i> Add Bonus</button>
+        <button type="button" data-act="deduction"><i class="fas fa-minus-circle ic-ded"></i> Add Deduction</button>
+    </div>
+    <div class="toast-wrap" id="toastWrap"></div>
+
+    <!-- Raise Modal -->
+    <div class="modal-overlay" id="raiseModal"><div class="modal modal-lg">
+        <div class="modal-header"><h3><i class="fas fa-arrow-trend-up" style="color:#059669;"></i> Add Salary Raise for <span id="raiseName">-</span></h3><button type="button" class="close-x" data-cancel="raise"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="modal-err" id="raiseErr"></div>
+            <div class="ro-grid">
+                <div class="ro"><span class="ro-l">Current Salary</span><span class="ro-v" id="raiseCurrent">-</span></div>
+                <div class="ro"><span class="ro-l">New Salary</span><span class="ro-v ro-accent" id="raiseNew">-</span></div>
+                <div class="ro"><span class="ro-l">Last Salary Raise Date</span><span class="ro-v" id="raiseLastDate">-</span></div>
+                <div class="ro"><span class="ro-l">Last Salary Raise Amount</span><span class="ro-v" id="raiseLastAmt">-</span></div>
+            </div>
+            <div class="cur-note" id="raiseCurNote" style="display:none;"></div>
+            <label class="conv-toggle" id="raiseConvWrap" style="display:none;"><input type="checkbox" id="raiseConv"> <i class="fas fa-right-left"></i> My amount is in USD — convert to AED automatically</label>
+            <div class="form-group" id="raiseUsdGroup" style="display:none;"><label>Salary Raise Amount in USD <span class="req">*</span></label><div class="input-prefixed"><span class="cur">USD</span><input type="number" min="0" step="1" class="form-control" id="raiseUsd" placeholder="0"></div></div>
+            <div class="form-group"><label id="raiseAmountLabel">Salary Raise Amount <span class="req">*</span></label><div class="input-prefixed"><span class="cur" id="raiseCur">AED</span><input type="number" min="0" step="1" class="form-control" id="raiseAmount" placeholder="0"></div><div class="field-hint round-note" id="raiseRoundNote" style="display:none;">Amounts with fractions are rounded up to the nearest whole number.</div></div>
+            <div class="form-group"><label>Salary Raise Reason <span class="req">*</span></label><textarea class="form-control" id="raiseReason" placeholder="Add a note / reason for this raise..."></textarea></div>
+        </div>
+        <div class="modal-footer modal-footer-fm add-footer">
+            <label class="fm-demo-toggle" title="Final managers (Mario / Adeeb / Jad) auto-approve their own requests">
+                <input type="checkbox" id="raiseAsFM"> <i class="fas fa-flask"></i> Demo: submit as a final manager
+            </label>
+            <span class="fm-demo-actions">
+                <button type="button" class="btn btn-outline" data-cancel="raise">Cancel</button>
+                <button type="button" class="btn btn-primary" data-confirm="raise"><i class="fas fa-check"></i> Confirm</button>
+            </span>
+        </div>
+        <div class="modal-footer edit-footer">
+            <button type="button" class="btn btn-outline" data-editcancel="raise">Cancel</button>
+            <button type="button" class="btn btn-primary" data-editupdate="raise" disabled><i class="fas fa-check"></i> Update</button>
+        </div>
+    </div></div>
+
+    <!-- Bonus Modal -->
+    <div class="modal-overlay" id="additionModal"><div class="modal modal-lg">
+        <div class="modal-header"><h3><i class="fas fa-plus-circle" style="color:#7c3aed;"></i> Add Bonus for <span id="addName">-</span></h3><button type="button" class="close-x" data-cancel="bonus"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="modal-err" id="addErr"></div>
+            <div class="ro-grid">
+                <div class="ro"><span class="ro-l">Current Salary</span><span class="ro-v" id="addCurrent">-</span></div>
+                <div class="ro"><span class="ro-l">Last Bonus Amount</span><span class="ro-v" id="addLastAmt">-</span></div>
+                <div class="ro"><span class="ro-l">Last Bonus Date</span><span class="ro-v" id="addLastDate">-</span></div>
+            </div>
+            <div class="cur-note" id="addCurNote" style="display:none;"></div>
+            <label class="conv-toggle" id="addConvWrap" style="display:none;"><input type="checkbox" id="addConv"> <i class="fas fa-right-left"></i> My amount is in USD — convert to AED automatically</label>
+            <div class="form-group" id="addUsdGroup" style="display:none;"><label>Bonus Amount in USD <span class="req">*</span></label><div class="input-prefixed"><span class="cur">USD</span><input type="number" min="0" step="1" class="form-control" id="addUsd" placeholder="0"></div></div>
+            <div class="form-group"><label id="addAmountLabel">Bonus Amount <span class="req">*</span></label><div class="input-prefixed"><span class="cur" id="addCur">AED</span><input type="number" min="0" step="1" class="form-control" id="addAmount" placeholder="0"></div><div class="field-hint round-note" id="addRoundNote" style="display:none;">Amounts with fractions are rounded up to the nearest whole number.</div></div>
+            <div class="form-group"><label>Bonus Purpose <span class="req">*</span></label>
+                <select class="form-control" id="addPurpose"><option value="">-- Select purpose --</option><option>Bonus</option><option>Equipment</option><option>Salary Dispute</option><option>Transportation Fare Reimbursement</option><option>Retail Incentive</option><option>Low Exchange Rate Compensation</option><option>Prorated Salary</option><option>Cash Advance</option><option>Final Settlement</option></select>
+            </div>
+            <div class="form-group"><label>Bonus Reason <span class="req">*</span></label><textarea class="form-control" id="addReason" placeholder="Add a note / reason for this bonus..."></textarea></div>
+        </div>
+        <div class="modal-footer modal-footer-fm add-footer">
+            <label class="fm-demo-toggle" title="Final managers (Mario / Adeeb / Jad) auto-approve their own requests">
+                <input type="checkbox" id="addAsFM"> <i class="fas fa-flask"></i> Demo: submit as a final manager
+            </label>
+            <span class="fm-demo-actions">
+                <button type="button" class="btn btn-outline" data-cancel="bonus">Cancel</button>
+                <button type="button" class="btn btn-primary" data-confirm="bonus"><i class="fas fa-check"></i> Confirm</button>
+            </span>
+        </div>
+        <div class="modal-footer edit-footer">
+            <button type="button" class="btn btn-outline" data-editcancel="bonus">Cancel</button>
+            <button type="button" class="btn btn-primary" data-editupdate="bonus" disabled><i class="fas fa-check"></i> Update</button>
+        </div>
+    </div></div>
+
+    <!-- Deduction Modal -->
+    <div class="modal-overlay" id="deductionModal"><div class="modal modal-lg">
+        <div class="modal-header"><h3><i class="fas fa-minus-circle" style="color:#dc2626;"></i> Add Deduction for <span id="dedName">-</span></h3><button type="button" class="close-x" data-cancel="deduction"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="modal-err" id="dedErr"></div>
+            <div class="ro-grid">
+                <div class="ro"><span class="ro-l">Current Salary</span><span class="ro-v" id="dedCurrent">-</span></div>
+                <div class="ro"><span class="ro-l">Last Deduction Amount</span><span class="ro-v" id="dedLastAmt">-</span></div>
+                <div class="ro"><span class="ro-l">Last Deduction Date</span><span class="ro-v" id="dedLastDate">-</span></div>
+            </div>
+            <div class="cur-note" id="dedCurNote" style="display:none;"></div>
+            <label class="conv-toggle" id="dedConvWrap" style="display:none;"><input type="checkbox" id="dedConv"> <i class="fas fa-right-left"></i> My amount is in USD — convert to AED automatically</label>
+            <div class="form-group" id="dedUsdGroup" style="display:none;"><label>Deduction Amount in USD <span class="req">*</span></label><div class="input-prefixed"><span class="cur">USD</span><input type="number" min="0" step="1" class="form-control" id="dedUsd" placeholder="0"></div></div>
+            <div class="form-group"><label id="dedAmountLabel">Deduction Amount <span class="req">*</span></label><div class="input-prefixed"><span class="cur" id="dedCur">AED</span><input type="number" min="0" step="1" class="form-control" id="dedAmount" placeholder="0"></div><div class="field-hint round-note" id="dedRoundNote" style="display:none;">Amounts with fractions are rounded up to the nearest whole number.</div></div>
+            <div class="form-group"><label>Deduction Purpose <span class="req">*</span></label>
+                <select class="form-control" id="dedPurpose"><option value="">-- Select purpose --</option><option>5% Pension Box Deduction</option><option>Absence / non-working days</option><option>Salary Dispute</option><option>Pension Compensation</option><option>Unpaid Vacation</option></select>
+            </div>
+            <div class="form-group"><label>Deduction Reason <span class="req">*</span></label><textarea class="form-control" id="dedReason" placeholder="Add a note / reason for this deduction..."></textarea></div>
+        </div>
+        <div class="modal-footer modal-footer-fm add-footer">
+            <label class="fm-demo-toggle" title="Final managers (Mario / Adeeb / Jad) auto-approve their own requests">
+                <input type="checkbox" id="dedAsFM"> <i class="fas fa-flask"></i> Demo: submit as a final manager
+            </label>
+            <span class="fm-demo-actions">
+                <button type="button" class="btn btn-outline" data-cancel="deduction">Cancel</button>
+                <button type="button" class="btn btn-primary" data-confirm="deduction"><i class="fas fa-check"></i> Confirm</button>
+            </span>
+        </div>
+        <div class="modal-footer edit-footer">
+            <button type="button" class="btn btn-outline" data-editcancel="deduction">Cancel</button>
+            <button type="button" class="btn btn-primary" data-editupdate="deduction" disabled><i class="fas fa-check"></i> Update</button>
+        </div>
+    </div></div>
+
+    <!-- Payroll History Modal (read-only) -->
+    <div class="modal-overlay" id="historyModal"><div class="modal modal-history">
+        <div class="modal-header"><h3 id="histTitle">Payroll History</h3><button type="button" class="close-x" data-close="historyModal"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="hist-prevnet"><span class="l">May 2026 Net Salary</span><span class="v" id="histPrevNet">-</span></div>
+
+            <div class="hist-section-title"><i class="fas fa-clock-rotate-left"></i> History of Payroll Changes</div>
+            <div class="hist-table-wrap" id="histChangesWrap">
+                <table class="hist-table">
+                    <colgroup><col style="width:11%"><col style="width:12%"><col style="width:16%"><col style="width:11%"><col style="width:19%"><col style="width:15%"><col style="width:16%"></colgroup>
+                    <thead><tr><th>Date</th><th>Type</th><th>Purpose</th><th>Amount</th><th>Reason</th><th>Manager</th><th>Approval Status</th></tr></thead>
+                    <tbody id="histChangesBody"></tbody>
+                </table>
+            </div>
+
+            <div class="hist-section-title"><i class="fas fa-hand-holding-dollar"></i> History of Loans</div>
+            <div class="hist-table-wrap" id="histLoansWrap">
+                <table class="hist-table">
+                    <colgroup><col style="width:13%"><col style="width:20%"><col style="width:14%"><col style="width:16%"><col style="width:21%"><col style="width:16%"></colgroup>
+                    <thead><tr><th>Date</th><th>Type</th><th>Amount</th><th>Monthly Repayment</th><th>Description</th><th>Approval Status</th></tr></thead>
+                    <tbody id="histLoansBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" data-close="historyModal">Close</button></div>
+    </div></div>
+
+    <!-- Duplicate Confirmation Modal -->
+    <div class="modal-overlay" id="dupModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3 id="dupTitle">Possible duplicate</h3><button type="button" class="close-x" id="dupClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body"><div class="confirm-body" id="dupBody"></div></div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="dupCancel">Cancel</button><button type="button" class="btn btn-primary" id="dupConfirm"><i class="fas fa-check"></i> Confirm</button></div>
+    </div></div>
+
+    <!-- Set Bonus Purpose (bulk) Modal -->
+    <div class="modal-overlay" id="setPurposeModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-tags" style="color:var(--primary-color);"></i> Set Bonus Purpose</h3><button type="button" class="close-x" id="setPurposeClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="modal-err" id="setPurposeErr"></div>
+            <p class="confirm-body" id="setPurposeIntro">Apply a bonus purpose to the selected agents.</p>
+            <div class="form-group"><label>Bonus Purpose <span class="req">*</span></label>
+                <select class="form-control" id="bulkPurpose"><option value="">-- Select purpose --</option><option>Bonus</option><option>Equipment</option><option>Salary Dispute</option><option>Transportation Fare Reimbursement</option><option>Retail Incentive</option><option>Low Exchange Rate Compensation</option><option>Prorated Salary</option><option>Cash Advance</option><option>Final Settlement</option></select>
+            </div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="setPurposeCancel">Cancel</button><button type="button" class="btn btn-primary" id="setPurposeConfirm"><i class="fas fa-check"></i> Apply to selected</button></div>
+    </div></div>
+
+    <!-- Agents Discard Confirm -->
+    <div class="modal-overlay" id="agentsDiscardModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-triangle-exclamation" style="color:#d97706;"></i> Discard unsaved changes?</h3><button type="button" class="close-x" id="agentsDiscardClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body"><p class="confirm-body">You have unsaved changes that will be lost. Are you sure you want to exit without saving?</p></div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="agentsDiscardCancel">Keep editing</button><button type="button" class="btn btn-danger" id="agentsDiscardConfirm"><i class="fas fa-xmark"></i> Discard &amp; exit</button></div>
+    </div></div>
+
+    <!-- Agents Submit Confirm -->
+    <div class="modal-overlay" id="agentsSubmitModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-paper-plane" style="color:var(--primary-color);"></i> Submit to payroll?</h3><button type="button" class="close-x" id="agentsSubmitClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body"><p class="confirm-body">Are you sure you have applied all changes? Once you confirm, this page will no longer be available and the bonuses will be sent to the Office Staff Payroll module for approval.</p></div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="agentsSubmitCancel">Cancel</button><button type="button" class="btn btn-primary" id="agentsSubmitConfirm"><i class="fas fa-check"></i> Confirm &amp; send</button></div>
+    </div></div>
+
+    <!-- Pending Requests Modal -->
+    <div class="modal-overlay" id="pendingModal"><div class="modal modal-history modal-wide">
+        <div class="modal-header"><h3><i class="fas fa-hourglass-half" style="color:#d97706;"></i> Pending Requests</h3><button type="button" class="close-x" data-close="pendingModal"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <p class="modal-intro">All salary-change requests across your team that are awaiting the final manager's approval. You can edit or delete a request while it is still pending.</p>
+            <div class="hist-table-wrap" id="pendingWrap" style="max-height:60vh;">
+                <table class="hist-table" id="pendingTable">
+                    <colgroup><col style="width:17%"><col style="width:10%"><col style="width:12%"><col style="width:11%"><col style="width:11%"><col style="width:19%"><col style="width:20%"></colgroup>
+                    <thead><tr><th>Office Staff Name</th><th>Date</th><th>Type</th><th>Purpose</th><th>Amount</th><th>Reason</th><th>Actions</th></tr></thead>
+                    <tbody id="pendingBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div></div>
+
+    <!-- Delete Pending Request Confirmation -->
+    <div class="modal-overlay" id="delModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Delete this request?</h3><button type="button" class="close-x" id="delClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="modal-err" id="delErr"></div>
+            <div class="danger-note"><i class="fas fa-triangle-exclamation"></i> This action is not reversible. The request will be permanently removed from payroll.</div>
+            <div id="delSummary" class="del-summary"></div>
+            <div class="form-group"><label>Why do you want to delete this? <span class="req">*</span></label><textarea class="form-control" id="delReason" placeholder="Enter the reason for deleting this request..."></textarea></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="delCancel">Cancel</button><button type="button" class="btn btn-danger" id="delConfirm"><i class="fas fa-trash"></i> Delete request</button></div>
+    </div></div>
+
+    <!-- Edit-Update Confirmation -->
+    <div class="modal-overlay" id="updModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-pen" style="color:var(--primary-color);"></i> Confirm update</h3><button type="button" class="close-x" id="updClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <p class="confirm-body">Please confirm you want to update this pending request. The updated values will replace the current request in payroll.</p>
+            <div class="form-group"><label>Why are you editing this request? <span class="opt">(optional)</span></label><textarea class="form-control" id="updReason" placeholder="Optional note explaining the change..."></textarea></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="updCancel">Cancel</button><button type="button" class="btn btn-primary" id="updConfirm"><i class="fas fa-check"></i> Confirm update</button></div>
+    </div></div>
+
+    <script>
+    (function() {
+        /* ---------------- Data ---------------- */
+        var EMIRATIS = [
+            { name:'Saeed Mohammed Al Mansoori', manager:'Omar Abdelhamid Yossef', dept:['Payroll'], titleMain:'Agent', titleSpec:'Senior Payroll Handler', joinDate:'2021-03-14', status:'active', salary:18000, country:'UAE', nationality:'Emirati', method:'Ansari Payplus', loan:0, newLoans:[], additions:[{amt:1500,reason:'performance bonus'}], deductions:[], raise:1000, reduction:0, onhold:false },
+            { name:'Mariam Khalifa Al Hashimi', manager:'Layla Ahmed Nasser', dept:['Payroll','Analytics and Reporting'], titleMain:'Business Analyst', titleSpec:'Payroll Analyst', joinDate:'2020-07-01', status:'active', salary:15500, country:'UAE', nationality:'Emirati', method:'Bank Transfer', loan:2000, newLoans:[], additions:[], deductions:[{amt:500,reason:'late attendance'}], raise:0, reduction:0, onhold:false },
+            { name:'Hamdan Rashid Al Maktoum', manager:'Omar Abdelhamid Yossef', dept:['Government Affairs'], titleMain:'Coordinator', titleSpec:'Government Liaison', joinDate:'2019-11-20', status:'active', salary:21000, country:'UAE', nationality:'Emirati', method:'Ansari Payplus', loan:0, newLoans:[{amt:3000,reason:'personal loan'}], additions:[], deductions:[], raise:0, reduction:1500, onhold:false },
+            { name:'Alia Sultan Al Suwaidi', manager:'Khalid Saeed Al Falasi', dept:['Recruitment'], titleMain:'Recruiter', titleSpec:'Talent Acquisition Specialist', joinDate:'2022-01-10', status:'active', salary:14000, country:'UAE', nationality:'Emirati', method:'Bank Transfer', loan:500, newLoans:[], additions:[{amt:600,reason:'referral bonus'}], deductions:[], raise:0, reduction:0, onhold:false },
+            { name:'Rashid Obaid Al Ketbi', manager:'Layla Ahmed Nasser', dept:['Risk Management'], titleMain:'Risk Analyst', titleSpec:'Compliance Officer', joinDate:'2018-05-30', status:'terminated', salary:17500, country:'UAE', nationality:'Emirati', method:'Ansari Payplus', loan:4000, newLoans:[], additions:[], deductions:[{amt:1200,reason:'salary dispute'}], raise:0, reduction:0, onhold:true },
+            { name:'Fatima Ali Al Zaabi', manager:'Khalid Saeed Al Falasi', dept:['Payroll'], titleMain:'Agent', titleSpec:'Payroll Handler', joinDate:'2023-02-15', status:'active', salary:13000, country:'UAE', nationality:'Emirati', method:'Ansari Payplus', loan:0, newLoans:[{amt:2000,reason:'emergency loan'}], additions:[{amt:300,reason:'overtime'}], deductions:[], raise:500, reduction:0, onhold:false }
+        ];
+        var OVERSEAS = [
+            { name:'Cinda Rose Sekareah', manager:'Maria Santos Cruz', dept:['Payroll'], titleMain:'Agent', titleSpec:'Payroll Handler', joinDate:'2022-06-05', status:'active', salary:1200, country:'Philippines', nationality:'Filipino', method:'Money Transfer Center', loan:100, newLoans:[], additions:[{amt:150,reason:'overtime'}], deductions:[], raise:50, reduction:0, onhold:false },
+            { name:'Ravi Kumar Sharma', manager:'Daniel John Smith', dept:['Bookers'], titleMain:'Agent', titleSpec:'Booking Specialist', joinDate:'2021-09-12', status:'active', salary:1100, country:'India', nationality:'Indian', method:'Bank Transfer', loan:0, newLoans:[], additions:[], deductions:[{amt:80,reason:'salary dispute'},{amt:40,reason:'equipment damage'}], raise:0, reduction:120, onhold:false },
+            { name:'Grace Achieng Wanjiru', manager:'Maria Santos Cruz', dept:['CC Resolvers'], titleMain:'Business Analyst', titleSpec:'Process Analyst', joinDate:'2020-02-28', status:'terminated', salary:1350, country:'Kenya', nationality:'Kenyan', method:'Money Transfer Center', loan:200, newLoans:[], additions:[], deductions:[], raise:0, reduction:0, onhold:true },
+            { name:'Miguel Angel Torres', manager:'Daniel John Smith', dept:['Sales Analytics'], titleMain:'Data Analyst', titleSpec:'Sales Reporter', joinDate:'2023-04-18', status:'active', salary:1000, country:'Mexico', nationality:'Mexican', method:'Bank Transfer', loan:0, newLoans:[{amt:500,reason:'personal loan'}], additions:[{amt:200,reason:'performance bonus'}], deductions:[], raise:0, reduction:0, onhold:false },
+            { name:'Nguyen Van Anh', manager:'Maria Santos Cruz', dept:['Chatbots Reporting'], titleMain:'Agent', titleSpec:'QA Specialist', joinDate:'2022-12-01', status:'active', salary:950, country:'Vietnam', nationality:'Vietnamese', method:'Money Transfer Center', loan:50, newLoans:[], additions:[], deductions:[{amt:60,reason:'unpaid leave'}], raise:100, reduction:0, onhold:false },
+            { name:'Amara Chidinma Okafor', manager:'Daniel John Smith', dept:['Doctors Operations'], titleMain:'Coordinator', titleSpec:'Medical Scheduler', joinDate:'2019-08-22', status:'active', salary:1400, country:'Nigeria', nationality:'Nigerian', method:'Bank Transfer', loan:300, newLoans:[{amt:800,reason:'medical loan'}], additions:[], deductions:[], raise:0, reduction:0, onhold:false },
+            { name:'Sok Pisey Chan', manager:'Maria Santos Cruz', dept:['Documentation'], titleMain:'Agent', titleSpec:'Documentation Clerk', joinDate:'2023-07-09', status:'active', salary:900, country:'Cambodia', nationality:'Cambodian', method:'Money Transfer Center', loan:0, newLoans:[], additions:[{amt:120,reason:'overtime'}], deductions:[], raise:0, reduction:0, onhold:false }
+        ];
+        var EXPATS = [
+            { name:'Mohammad Tariq Al Khalil', manager:'Omar Abdelhamid Yossef', dept:['Payroll'], titleMain:'Agent', titleSpec:'Process Improvement Analyst', joinDate:'2021-05-17', status:'active', salary:14000, country:'UAE', nationality:'Syrian', method:'Ansari Payplus', loan:1000, newLoans:[], additions:[{amt:800,reason:'bonus'}], deductions:[], raise:500, reduction:0, onhold:false },
+            { name:'Anjali Priya Menon', manager:'Layla Ahmed Nasser', dept:['Payroll','Auditing'], titleMain:'Accountant', titleSpec:'Senior Accountant', joinDate:'2020-10-03', status:'active', salary:16500, country:'UAE', nationality:'Indian', method:'Bank Transfer', loan:0, newLoans:[], additions:[{amt:1000,reason:'project completion'}], deductions:[{amt:300,reason:'unpaid leave'}], raise:0, reduction:0, onhold:false, prevUnpaid:16500 },
+            { name:'Tariq Mahmoud Hassan', manager:'Khalid Saeed Al Falasi', dept:['Risk Management'], titleMain:'Risk Analyst', titleSpec:'Risk Specialist', joinDate:'2022-03-21', status:'active', salary:13200, country:'UAE', nationality:'Egyptian', method:'Ansari Payplus', loan:500, newLoans:[], additions:[], deductions:[{amt:250,reason:'salary dispute'}], raise:0, reduction:250, onhold:false },
+            { name:'Sara Elias Haddad', manager:'Layla Ahmed Nasser', dept:['Marketing'], titleMain:'Specialist', titleSpec:'Content Strategist', joinDate:'2023-01-08', status:'active', salary:12000, country:'UAE', nationality:'Lebanese', method:'Bank Transfer', loan:0, newLoans:[{amt:4000,reason:'car loan'}], additions:[], deductions:[], raise:0, reduction:0, onhold:false },
+            { name:'Imran Ahmed Sheikh', manager:'Khalid Saeed Al Falasi', dept:['Procurement'], titleMain:'Officer', titleSpec:'Procurement Officer', joinDate:'2019-06-14', status:'terminated', salary:15000, country:'UAE', nationality:'Pakistani', method:'Ansari Payplus', loan:6000, newLoans:[], additions:[], deductions:[{amt:2000,reason:'salary dispute'}], raise:0, reduction:0, onhold:true },
+            { name:'Lina Georges Khoury', manager:'Omar Abdelhamid Yossef', dept:['Legal'], titleMain:'Associate', titleSpec:'Legal Associate', joinDate:'2021-12-19', status:'active', salary:17000, country:'UAE', nationality:'Lebanese', method:'Bank Transfer', loan:0, newLoans:[], additions:[{amt:500,reason:'retention bonus'}], deductions:[], raise:1000, reduction:0, onhold:false }
+        ];
+        function decorate(arr,type,cur){ arr.forEach(function(r){ r.empType=type; r.cur=cur; r.rosterMgr='Omar Abdelhamid Yossef'; }); }
+        decorate(EMIRATIS,'Emirati','AED'); decorate(OVERSEAS,'Overseas','USD'); decorate(EXPATS,'Expat','AED');
+        // Some overseas staff are paid in other currencies (demonstrates the action-modal currency note / conversion)
+        (function(){
+            var byName={}; OVERSEAS.forEach(function(r){ byName[r.name]=r; });
+            // AED-paid overseas (enables the USD->AED conversion checkbox)
+            if(byName['Cinda Rose Sekareah']) byName['Cinda Rose Sekareah'].cur='AED';
+            if(byName['Amara Chidinma Okafor']) byName['Amara Chidinma Okafor'].cur='AED';
+            // Other-currency overseas (shows the "convert before submitting" note)
+            if(byName['Ravi Kumar Sharma']) byName['Ravi Kumar Sharma'].cur='INR';
+            if(byName['Miguel Angel Torres']) byName['Miguel Angel Torres'].cur='EUR';
+        })();
+        var ALL = EMIRATIS.concat(OVERSEAS, EXPATS);
+        var TABS = { all:ALL, emiratis:EMIRATIS, overseas:OVERSEAS, expats:EXPATS };
+        var ROWS_BY_ID={}, _seq=0;
+        var TODAY=new Date('2026-06-02T00:00:00');  // matches the app's "current date"
+        function isoOf(d){ var y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),da=String(d.getDate()).padStart(2,'0'); return y+'-'+m+'-'+da; }
+        function daysAgo(n){ var d=new Date(TODAY); d.setDate(d.getDate()-n); return isoOf(d); }
+        function within30(iso){ var d=new Date(iso+'T00:00:00'); var diff=(TODAY-d)/86400000; return diff>=0 && diff<=30; }
+        var BONUS_PURPOSES=['Bonus','Equipment','Salary Dispute','Transportation Fare Reimbursement','Retail Incentive','Low Exchange Rate Compensation','Prorated Salary','Cash Advance','Final Settlement'];
+        var DED_PURPOSES=['5% Pension Box Deduction','Absence / non-working days','Salary Dispute','Pension Compensation','Unpaid Vacation'];
+        var RAISE_REASONS=['Annual merit increase','Promotion adjustment','Market alignment','Performance review uplift','Role expansion'];
+        var BONUS_REASONS=['Q1 performance bonus','Referral payout','Project delivery reward','Overtime compensation','Spot recognition award'];
+        var DED_REASONS=['Unpaid leave taken','Attendance shortfall','Salary correction','Pension box contribution','Disputed overpayment'];
+        var LOAN_DESCS=['Personal loan','Emergency medical loan','Car loan','Salary advance','Housing assistance'];
+
+        // Seeded PRNG for deterministic demo data
+        function rng(seed){ var x=seed; return function(){ x=(x*1103515245+12345)&0x7fffffff; return x/0x7fffffff; }; }
+        function pick(rand,arr){ return arr[Math.floor(rand()*arr.length)]; }
+        function roundTo(v,step){ return Math.max(step,Math.round(v/step)*step); }
+
+        // Employees that should carry a recent (<=30d) change to demo the duplicate validation.
+        // For each, we record the exact amount on raise/bonus/deduction so the modal's "last*" matches a history row.
+        ALL.forEach(function(r,i){
+            r._id=++_seq; ROWS_BY_ID[r._id]=r;
+            var rand=rng(97+i*131);
+            var step=(r.cur==='USD')?10:50;
+
+            // ----- Payroll change history (0..15 rows) -----
+            var nChanges=Math.floor(rand()*16); // 0..15
+            var changes=[];
+            // Guarantee a recent duplicate-demo change on most employees (15+ recent overall across team)
+            var seedRecent = i % 1 === 0 ? (i<15) : false; // first 15 employees get a recent change
+            for(var c=0;c<nChanges;c++){
+                var typeRoll=rand();
+                var type = typeRoll<0.3?'Salary Raise':(typeRoll<0.6?'Bonus':(typeRoll<0.85?'Deduction':'Salary Reduction'));
+                var ageDays = Math.floor(rand()*150); // up to ~5 months back
+                var amt = roundTo(r.salary*(0.02+rand()*0.08), step);
+                var purpose='';
+                var reason='';
+                if(type==='Bonus'){ purpose=pick(rand,BONUS_PURPOSES); reason=pick(rand,BONUS_REASONS); }
+                else if(type==='Deduction'){ purpose=pick(rand,DED_PURPOSES); reason=pick(rand,DED_REASONS); }
+                else if(type==='Salary Raise'){ reason=pick(rand,RAISE_REASONS); }
+                else { reason='Salary adjustment'; }
+                var cDate=daysAgo(ageDays);
+                var status = (rand()<0.4 && cDate>='2026-05-16') ? 'Pending' : 'Approved';
+                changes.push({ date:cDate, type:type, purpose:purpose, amt:amt, reason:reason, manager:r.manager, status:status });
+            }
+            // Inject a guaranteed recent change for the first 15 employees (duplicate-validation demo)
+            if(i<15){
+                if(changes.length>14) changes=changes.slice(0,14); // keep total <=15 after injection
+                var dtype=['Salary Raise','Bonus','Deduction'][i%3];
+                var recentAmt=roundTo(r.salary*0.05, step);
+                var recentAge=Math.floor(rand()*25)+1; // 1..25 days ago (within 30)
+                var rPurpose = dtype==='Bonus'?'Bonus':(dtype==='Deduction'?'Unpaid Vacation':'');
+                var rReason = dtype==='Salary Raise'?'Annual merit increase':(dtype==='Bonus'?'Q1 performance bonus':'Unpaid leave taken');
+                var rDate=daysAgo(recentAge);
+                var rStatus = (i%2!==0 && rDate>='2026-05-16') ? 'Pending' : 'Approved';
+                changes.push({ date:rDate, type:dtype, purpose:rPurpose, amt:recentAmt, reason:rReason, manager:r.manager, status:rStatus });
+            }
+            r.changeHistory=changes;
+
+            // ----- Loan history (0..4 rows) -----
+            var nLoans=Math.floor(rand()*5); // 0..4
+            var loans=[];
+            for(var l=0;l<nLoans;l++){
+                var lAmt=roundTo(r.salary*(0.3+rand()*1.2), step);
+                var months=[3,6,12,18,24][Math.floor(rand()*5)];
+                var monthly=roundTo(lAmt/months, (r.cur==='USD')?5:25);
+                var lDate=daysAgo(Math.floor(rand()*300)+10);
+                loans.push({ date:lDate, type:pick(rand,LOAN_DESCS), amt:lAmt, monthly:monthly, desc:pick(rand,LOAN_DESCS), status: (rand()<0.35 && lDate>='2026-05-16')?'Pending':'Approved' });
+            }
+            r.loanHistory=loans;
+
+            // ----- Pending (not-yet-approved) line items shown greyed in the main table -----
+            // Map change-history "Pending" rows into the column buckets they affect.
+            // (Demo data: uses the same pending records surfaced in the Payroll History modal.)
+            r.pending = { additions:[], deductions:[], newLoans:[], raise:0, reduction:0 };
+            (changes||[]).forEach(function(c){
+                if(c.status.indexOf('Pending')!==0) return;
+                if(c.type==='Bonus') r.pending.additions.push({ amt:c.amt, reason:(c.purpose||c.reason||'bonus') });
+                else if(c.type==='Deduction') r.pending.deductions.push({ amt:c.amt, reason:(c.purpose||c.reason||'deduction') });
+                else if(c.type==='Salary Raise') r.pending.raise += c.amt;
+                else if(c.type==='Salary Reduction') r.pending.reduction += c.amt;
+            });
+
+            // ----- May 2026 net salary (previous month) -----
+            r.prevNet = r.salary + sumItems(r.additions) - Math.round(r.salary*0.02) - (r.loan||0);
+            r.noPrevSalary = false; // set after all employees are built (fixed quota per type)
+
+            // ----- last* derived from most recent matching history rows (fallbacks if none) -----
+            function latestOf(t){ var rows=changes.filter(function(x){ return x.type===t; }).slice().sort(function(a,b){ return b.date<a.date?-1:1; }); return rows[0]; }
+            var lr=latestOf('Salary Raise'), lb=latestOf('Bonus'), ld=latestOf('Deduction');
+            r.lastRaise = lr ? {date:lr.date, amt:lr.amt} : {date:daysAgo(120+i), amt:roundTo(r.salary*0.05,step)};
+            r.lastBonus = lb ? {date:lb.date, amt:lb.amt} : {date:daysAgo(95+i), amt:roundTo(r.salary*0.06,step)};
+            r.lastDeduction = ld ? {date:ld.date, amt:ld.amt} : {date:daysAgo(70+i), amt:roundTo(r.salary*0.03,step)};
+        });
+
+        // Flag a fixed quota of employees as having no previous-month salary record
+        (function(){
+            var quota={ Emirati:2, Overseas:3, Expat:2 };
+            ALL.forEach(function(r){
+                if(quota[r.empType]>0){ r.noPrevSalary=true; quota[r.empType]--; }
+            });
+        })();
+
+        /* ---------------- Columns ---------------- */
+        var COLUMNS = [
+            { key:'name', label:'Office Staff Name', type:'main', cls:'col-name' },
+            { key:'manager', label:'Manager', type:'main' },
+            { key:'rosterMgr', label:'Roster Manager', type:'additional' },
+            { key:'dept', label:'Department', type:'additional', wrap:true },
+            { key:'title', label:'Job Title', type:'main', wrap:true },
+            { key:'joinDate', label:'Joining Date', type:'additional' },
+            { key:'empType', label:'Employee Type', type:'allOnly' },
+            { key:'status', label:'Status', type:'additional' },
+            { key:'salary', label:'Salary', type:'main' },
+            { key:'country', label:'Country', type:'additional' },
+            { key:'nationality', label:'Nationality', type:'additional' },
+            { key:'method', label:'Salary Transfer Method', type:'additional' },
+            { key:'loan', label:'Loan Repayment', type:'main' },
+            { key:'newLoans', label:'New Loans', type:'main', wrap:true },
+            { key:'additions', label:'Additions', type:'main', wrap:true },
+            { key:'deductions', label:'Deductions', type:'main', wrap:true },
+            { key:'raise', label:'Salary Raise', type:'main' },
+            { key:'reduction', label:'Salary Reduction', type:'main' },
+            { key:'net', label:'Net Salary', type:'main' },
+            { key:'toTransfer', label:'Salary to be Transferred', type:'additional' },
+            { key:'onhold', label:'Salary On-Hold', type:'additional' },
+            { key:'actions', label:'Actions', type:'main', cls:'cell-actions' }
+        ];
+        var ADDITIONAL_KEYS = COLUMNS.filter(function(c){ return c.type==='additional'; }).map(function(c){ return c.key; });
+
+        /* ---------------- State ---------------- */
+        var state = { tab:'all', search:'', manager:'', rosterMgr:'', title:'', dept:'', addl:{}, visibleAdditional:{}, defaultAdditional:{} };
+
+        /* ---------------- Helpers ---------------- */
+        function esc(s){ var d=document.createElement('div'); d.textContent=(s==null?'':String(s)); return d.innerHTML; }
+        function fmt(n,cur){ return cur+' '+Number(n).toLocaleString('en-US'); }
+        function sumItems(a){ return (a||[]).reduce(function(t,i){ return t+Number(i.amt||0); },0); }
+        function net(r){ return r.salary+sumItems(r.additions)-sumItems(r.deductions)+sumItems(r.newLoans)-(r.loan||0); }
+        function toTransfer(r){ return r.onhold?0:net(r)+(r.prevUnpaid||0); }
+        var MONTHS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        function fmtDate(iso){ var p=iso.split('-'); return parseInt(p[2],10)+' '+MONTHS[parseInt(p[1],10)-1]+' '+p[0]; }
+        function itemsHtml(arr,cur,pending){
+            arr=arr||[]; pending=pending||[];
+            if(!arr.length && !pending.length) return '<span class="num-zero">&mdash;</span>';
+            var out=arr.map(function(i){ return '<span class="item-line"><span class="amt">'+fmt(i.amt,cur)+'</span> <span class="reason">as '+esc(i.reason)+'</span></span>'; });
+            out=out.concat(pending.map(function(i){ return '<span class="item-line pending-item"><span class="amt">'+fmt(i.amt,cur)+'</span> <span class="reason">as '+esc(i.reason)+' (pending approval)</span></span>'; }));
+            return out.join('');
+        }
+        // single-value column (raise/reduction/loan) with an optional pending amount appended
+        function singleValHtml(approved,pending,cur,posNeg){
+            var out='';
+            if(approved) out+='<span class="num '+posNeg+'">'+fmt(approved,cur)+'</span>';
+            else if(!pending) out+='<span class="num num-zero">&mdash;</span>';
+            if(pending) out+=(out&&approved?'':'')+'<span class="item-line pending-item"><span class="amt">'+fmt(pending,cur)+'</span> <span class="reason">(pending approval)</span></span>';
+            return out;
+        }
+        function typeBadge(t){ var c=t==='Emirati'?'b-type-emirati':(t==='Overseas'?'b-type-overseas':'b-type-expat'); return '<span class="badge '+c+'">'+esc(t)+'</span>'; }
+        function distinct(rows,getter){ var s=[]; rows.forEach(function(r){ getter(r).forEach(function(v){ if(v&&s.indexOf(v)===-1) s.push(v); }); }); s.sort(); return s; }
+
+        /* ---------------- Cell renderer ---------------- */
+        function cell(col,r){
+            var cur=r.cur;
+            switch(col.key){
+                case 'name': return '<a href="#" class="cell-name emp-name-link" data-history-id="'+r._id+'">'+esc(r.name)+'</a>';
+                case 'manager': return esc(r.manager);
+                case 'rosterMgr': return esc(r.rosterMgr);
+                case 'dept': return esc((r.dept||[]).join(', '));
+                case 'title': return '<span class="jt-main">'+esc(r.titleMain)+'</span><span class="jt-spec">('+esc(r.titleSpec)+')</span>';
+                case 'joinDate': return fmtDate(r.joinDate);
+                case 'empType': return typeBadge(r.empType);
+                case 'status': return r.status==='terminated'?'<span class="badge b-terminated"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Terminated</span>':'<span class="badge b-active"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Active</span>';
+                case 'salary': return '<span class="num">'+fmt(r.salary,cur)+'</span>';
+                case 'country': return esc(r.country);
+                case 'nationality': return esc(r.nationality);
+                case 'method': return esc(r.method);
+                case 'loan': return r.loan?'<span class="num num-neg">'+fmt(r.loan,cur)+'</span>':'<span class="num num-zero">&mdash;</span>';
+                case 'newLoans': return itemsHtml(r.newLoans,cur,r.pending.newLoans);
+                case 'additions': return itemsHtml(r.additions,cur,r.pending.additions);
+                case 'deductions': return itemsHtml(r.deductions,cur,r.pending.deductions);
+                case 'raise': return singleValHtml(r.raise,r.pending.raise,cur,'num-pos');
+                case 'reduction': return singleValHtml(r.reduction,r.pending.reduction,cur,'num-neg');
+                case 'net': return '<span class="num net-salary">'+fmt(net(r),cur)+'</span>';
+                case 'toTransfer': var note=(!r.onhold&&r.prevUnpaid)?'<span class="sub-note">incl. '+fmt(r.prevUnpaid,cur)+' prev. unpaid</span>':''; return '<span class="num">'+fmt(toTransfer(r),cur)+'</span>'+note;
+                case 'onhold': return r.onhold?'<span class="badge b-onhold-yes">Yes</span>':'<span class="badge b-onhold-no">No</span>';
+                case 'actions': return '<button type="button" class="action-menu-btn" data-id="'+r._id+'" data-name="'+esc(r.name)+'" data-cur="'+cur+'" title="Actions"><i class="fas fa-ellipsis-v"></i></button>';
+            }
+            return '';
+        }
+
+        function isVisible(col){ if(col.type==='main') return true; if(col.type==='allOnly') return state.tab==='all'; if(col.type==='additional') return !!state.visibleAdditional[col.key]; return false; }
+        function anyAdditionalVisible(){ return ADDITIONAL_KEYS.some(function(k){ return !!state.visibleAdditional[k]; }); }
+
+        /* ---------------- Pending requests (team-wide) ---------------- */
+        var PENDING=[]; var _pseq=0;
+        function buildPending(){
+            PENDING=[]; _pseq=0;
+            ALL.forEach(function(r){
+                (r.changeHistory||[]).forEach(function(c){
+                    if(c.status.indexOf('Pending')!==0) return;
+                    if(['Salary Raise','Bonus','Deduction'].indexOf(c.type)===-1) return;
+                    PENDING.push({ pid:++_pseq, empId:r._id, name:r.name, cur:r.cur, date:c.date, type:c.type, purpose:c.purpose||'', amt:c.amt, reason:c.reason||'', _src:c });
+                });
+            });
+            PENDING.sort(function(a,b){ if(a.date!==b.date) return a.date<b.date?1:-1; return a.name.localeCompare(b.name); });
+        }
+        function pendingById(pid){ return PENDING.filter(function(x){ return x.pid===pid; })[0]; }
+
+        /* ---------------- Filtering ---------------- */
+        var ADDL_PREDICATES = {
+            onhold:function(r){ return r.onhold===true; },
+            hasLoan:function(r){ return (r.loan||0)>0; },
+            hasNewLoan:function(r){ return (r.newLoans||[]).length>0; },
+            hasAdd:function(r){ return (r.additions||[]).length>0; },
+            hasDed:function(r){ return (r.deductions||[]).length>0; },
+            hasRaise:function(r){ return (r.raise||0)>0; },
+            hasRed:function(r){ return (r.reduction||0)>0; },
+            activeOnly:function(r){ return r.status==='active'; },
+            terminatedOnly:function(r){ return r.status==='terminated'; }
+        };
+        function applyFilters(rows){
+            var q=state.search.trim().toLowerCase();
+            return rows.filter(function(r){
+                if(q && r.name.toLowerCase().indexOf(q)===-1) return false;          // search: office staff name only
+                if(state.manager && r.manager!==state.manager) return false;
+                if(state.rosterMgr && r.rosterMgr!==state.rosterMgr) return false;
+                if(state.title && r.titleMain!==state.title && r.titleSpec!==state.title) return false;  // matches either title
+                if(state.dept && (r.dept||[]).indexOf(state.dept)===-1) return false;
+                for(var k in state.addl){ if(state.addl[k] && !ADDL_PREDICATES[k](r)) return false; }
+                return true;
+            });
+        }
+
+        /* ---------------- Render table (preserve horizontal scroll, reset to first row) ---------------- */
+        var panel=document.getElementById('rosterPanel');
+        function renderTable(){
+            var oldWrap=panel.querySelector('.roster-table-wrap');
+            var prevLeft=oldWrap?oldWrap.scrollLeft:0;
+            var rows=applyFilters(TABS[state.tab]).slice().sort(function(a,b){
+                var m=a.manager.localeCompare(b.manager);
+                return m!==0 ? m : a.name.localeCompare(b.name);
+            });
+            var rc=document.getElementById('rowCount');
+            if(rc) rc.innerHTML='<strong>'+rows.length+'</strong> '+(rows.length===1?'employee':'employees');
+            var cols=COLUMNS.filter(isVisible);
+            var scroll=anyAdditionalVisible();
+            var html='<div class="roster-table-wrap '+(scroll?'scroll':'fit')+'"><table class="roster-table"><thead><tr>';
+            cols.forEach(function(c){ html+='<th class="'+(c.cls||'')+(c.wrap?' wrap':'')+'">'+esc(c.label)+'</th>'; });
+            html+='</tr></thead><tbody>';
+            if(!rows.length){
+                html+='<tr><td colspan="'+cols.length+'"><div class="empty-state"><i class="fas fa-users-slash"></i>No employees match the current filters.</div></td></tr>';
+            } else {
+                rows.forEach(function(r){ html+='<tr>'; cols.forEach(function(c){ html+='<td class="'+(c.cls||'')+(c.wrap?' wrap':'')+'">'+cell(c,r)+'</td>'; }); html+='</tr>'; });
+            }
+            html+='</tbody></table></div>';
+            panel.innerHTML=html;
+            var newWrap=panel.querySelector('.roster-table-wrap');
+            if(newWrap){ newWrap.scrollLeft=prevLeft; newWrap.scrollTop=0; } // keep columns, jump to first row
+            layout();
+        }
+
+        /* ---------------- Layout: table fills viewport under sticky tabs ---------------- */
+        var pageScroll=document.getElementById('pageScroll');
+        var tabsBar=document.getElementById('tabsBar');
+        var toolbar=document.getElementById('toolbar');
+        function outer(el){ var s=getComputedStyle(el); return el.offsetHeight+parseFloat(s.marginTop||0)+parseFloat(s.marginBottom||0); }
+        function layout(){
+            var wrap=panel.querySelector('.roster-table-wrap');
+            if(!wrap) return;
+            var avail=pageScroll.clientHeight;
+            var h=avail-outer(tabsBar)-outer(toolbar)-22; // leave breathing room above the screen edge
+            h=Math.max(200,h);
+            wrap.style.height='';          // dynamic: when rows are fewer, the table shrinks to fit them
+            wrap.style.maxHeight=h+'px';   // and never grows past the available viewport height
+        }
+        window.addEventListener('resize', function(){ layout(); });
+
+        /* ---------------- Tab counts ---------------- */
+        function refreshTabCounts(){ document.querySelectorAll('.tab-count').forEach(function(el){ el.textContent=TABS[el.getAttribute('data-count')].length; }); }
+
+        /* ---------------- Searchable selects ---------------- */
+        function SSelect(root, key, allLabel){
+            var self=this; this.root=root; this.key=key; this.allLabel=allLabel; this.opts=[];
+            this.trigger=root.querySelector('.ss-trigger');
+            this.text=root.querySelector('.ss-text');
+            this.search=root.querySelector('.ss-search input');
+            this.box=root.querySelector('.ss-options');
+            this.trigger.addEventListener('click', function(e){
+                e.stopPropagation();
+                if(root.classList.contains('disabled')) return;
+                var open=root.classList.contains('open');
+                closeAllSelects();
+                if(!open){ root.classList.add('open'); self.search.value=''; self.renderOpts(''); setTimeout(function(){ self.search.focus(); },30); }
+            });
+            this.search.addEventListener('click', function(e){ e.stopPropagation(); });
+            this.search.addEventListener('input', function(){ self.renderOpts(this.value); });
+            this.box.addEventListener('click', function(e){
+                var o=e.target.closest('.ss-option'); if(!o||o.classList.contains('none')) return;
+                state[self.key]=o.getAttribute('data-val'); self.setText(); root.classList.remove('open'); renderTable();
+            });
+        }
+        SSelect.prototype.setText=function(){ var v=state[this.key]; this.text.textContent=v?v:this.allLabel; this.text.classList.toggle('placeholder',!v); };
+        SSelect.prototype.renderOpts=function(filter){
+            var q=(filter||'').toLowerCase(); var self=this;
+            var list=this.opts.filter(function(o){ return !q||o.toLowerCase().indexOf(q)!==-1; });
+            var html='<div class="ss-option'+(!state[this.key]?' selected':'')+'" data-val="">'+esc(this.allLabel)+'</div>';
+            if(!list.length && q){ html+='<div class="ss-option none">No matches</div>'; }
+            list.forEach(function(o){ html+='<div class="ss-option'+(state[self.key]===o?' selected':'')+'" data-val="'+esc(o)+'">'+esc(o)+'</div>'; });
+            this.box.innerHTML=html;
+        };
+        SSelect.prototype.apply=function(opts){
+            this.opts=opts;
+            if(opts.length<=1){
+                state[this.key]=opts[0]||'';
+                this.root.classList.add('disabled');
+            } else {
+                if(opts.indexOf(state[this.key])===-1) state[this.key]='';
+                this.root.classList.remove('disabled');
+            }
+            this.setText();
+        };
+
+        var GET = {
+            manager:function(r){ return [r.manager]; },
+            rosterMgr:function(r){ return [r.rosterMgr]; },
+            title:function(r){ return [r.titleMain, r.titleSpec]; },
+            dept:function(r){ return r.dept; }
+        };
+        var SS = {
+            manager:   new SSelect(document.getElementById('ssManager'),'manager','All managers'),
+            rosterMgr: new SSelect(document.getElementById('ssRosterMgr'),'rosterMgr','All roster managers'),
+            title:     new SSelect(document.getElementById('ssTitle'),'title','All job titles'),
+            dept:      new SSelect(document.getElementById('ssDept'),'dept','All departments')
+        };
+        function refreshSelects(){
+            var rows=TABS[state.tab];
+            Object.keys(SS).forEach(function(k){ SS[k].apply(distinct(rows, GET[k])); });
+        }
+        function closeAllSelects(){ document.querySelectorAll('.ss.open').forEach(function(el){ el.classList.remove('open'); }); }
+        document.addEventListener('click', function(e){ if(!e.target.closest('.ss')) closeAllSelects(); });
+
+        /* ---------------- Additional filter chips ---------------- */
+        var ADDL_DEFS=[
+            {k:'hasLoan',label:'Has loan repayment'},{k:'hasNewLoan',label:'Has new loan'},{k:'hasAdd',label:'Has additions'},
+            {k:'hasDed',label:'Has deductions'},{k:'hasRaise',label:'Has salary raise'},{k:'hasRed',label:'Has salary reduction'},
+            {k:'onhold',label:'Salary on-hold'},{k:'activeOnly',label:'Active only'},{k:'terminatedOnly',label:'Terminated only'}
+        ];
+        function buildAddlFilters(){
+            var wrap=document.getElementById('addlFilters');
+            wrap.innerHTML=ADDL_DEFS.map(function(d){ return '<span class="chk-chip" data-k="'+d.k+'"><i class="fas fa-check"></i>'+esc(d.label)+'</span>'; }).join('');
+            wrap.querySelectorAll('.chk-chip').forEach(function(chip){
+                chip.addEventListener('click', function(){
+                    var k=chip.getAttribute('data-k');
+                    var nowChecked=!state.addl[k];
+                    state.addl[k]=nowChecked;
+                    if(nowChecked && k==='activeOnly') state.addl.terminatedOnly=false;
+                    if(nowChecked && k==='terminatedOnly') state.addl.activeOnly=false;
+                    syncAddlChips();
+                    renderTable();
+                });
+            });
+        }
+        function syncAddlChips(){ document.querySelectorAll('#addlFilters .chk-chip').forEach(function(chip){ chip.classList.toggle('checked', !!state.addl[chip.getAttribute('data-k')]); }); }
+
+        /* ---------------- Additional columns panel ---------------- */
+        function buildColOptions(){
+            var box=document.getElementById('colOptions');
+            box.innerHTML=COLUMNS.filter(function(c){ return c.type==='additional'; }).map(function(c){ return '<label class="col-opt"><input type="checkbox" data-col="'+c.key+'"> '+esc(c.label)+'</label>'; }).join('');
+            box.querySelectorAll('input[data-col]').forEach(function(cb){ cb.addEventListener('change', function(){ state.visibleAdditional[cb.getAttribute('data-col')]=cb.checked; syncColBulkButtons(); renderTable(); }); });
+        }
+        function syncColOptions(){
+            document.querySelectorAll('#colOptions input[data-col]').forEach(function(cb){ cb.checked=!!state.visibleAdditional[cb.getAttribute('data-col')]; });
+            syncColBulkButtons();
+        }
+        function syncColBulkButtons(){
+            var total=ADDITIONAL_KEYS.length;
+            var selected=ADDITIONAL_KEYS.filter(function(k){ return !!state.visibleAdditional[k]; }).length;
+            var sa=document.getElementById('btnColsSelectAll'), cl=document.getElementById('btnColsClear');
+            if(sa) sa.disabled = (selected===total);
+            if(cl) cl.disabled = (selected===0);
+        }
+
+        /* ---------------- Wiring ---------------- */
+        document.getElementById('fSearch').addEventListener('input', function(){ state.search=this.value; renderTable(); });
+
+        document.querySelectorAll('.roster-tab[data-tab]').forEach(function(t){
+            t.addEventListener('click', function(){
+                document.querySelectorAll('.roster-tab[data-tab]').forEach(function(x){ x.classList.remove('active'); });
+                t.classList.add('active');
+                state.tab=t.getAttribute('data-tab');
+                state.visibleAdditional={}; for(var k in state.defaultAdditional){ if(state.defaultAdditional[k]) state.visibleAdditional[k]=true; }
+                refreshSelects(); syncColOptions(); renderTable();
+            });
+        });
+
+        var colsWrap=document.getElementById('colsWrap');
+        document.getElementById('btnCols').addEventListener('click', function(e){ e.stopPropagation(); colsWrap.classList.toggle('open'); syncColOptions(); });
+        document.addEventListener('click', function(e){ if(!colsWrap.contains(e.target)) colsWrap.classList.remove('open'); });
+        document.getElementById('btnSaveView').addEventListener('click', function(){
+            state.defaultAdditional={}; for(var k in state.visibleAdditional){ if(state.visibleAdditional[k]) state.defaultAdditional[k]=true; }
+            var msg=document.getElementById('savedMsg'); msg.classList.add('show'); setTimeout(function(){ msg.classList.remove('show'); },1800);
+        });
+        document.getElementById('btnColsSelectAll').addEventListener('click', function(){
+            if(this.disabled) return;
+            ADDITIONAL_KEYS.forEach(function(k){ state.visibleAdditional[k]=true; });
+            syncColOptions(); renderTable();
+        });
+        document.getElementById('btnColsClear').addEventListener('click', function(){
+            if(this.disabled) return;
+            state.visibleAdditional={};
+            syncColOptions(); renderTable();
+        });
+
+        // Reset Filters: clear search, dropdowns, and additional-filter chips
+        document.getElementById('btnResetFilters').addEventListener('click', function(){
+            state.search=''; document.getElementById('fSearch').value='';
+            state.manager=''; state.rosterMgr=''; state.title=''; state.dept='';
+            state.addl={};
+            refreshSelects();   // re-applies (and may re-disable single-value dropdowns) + resets their text
+            syncAddlChips();
+            closeAllSelects();
+            renderTable();
+        });
+
+        /* ---------------- Floating action menu ---------------- */
+        var floatMenu=document.getElementById('floatMenu');
+        var menuCtx={ name:'-', cur:'AED' };
+        function hideMenu(){ floatMenu.classList.remove('open'); document.querySelectorAll('.action-menu-btn.active').forEach(function(b){ b.classList.remove('active'); }); }
+        document.addEventListener('click', function(e){
+            var btn=e.target.closest('.action-menu-btn');
+            if(btn){
+                e.stopPropagation();
+                var wasActive=btn.classList.contains('active'); hideMenu(); if(wasActive) return;
+                btn.classList.add('active');
+                menuCtx.name=btn.getAttribute('data-name'); menuCtx.cur=btn.getAttribute('data-cur');
+                menuCtx.row=ROWS_BY_ID[btn.getAttribute('data-id')];
+                var rect=btn.getBoundingClientRect();
+                floatMenu.classList.add('open');
+                var mw=floatMenu.offsetWidth||190, mh=floatMenu.offsetHeight||130;
+                var left=Math.max(8, rect.right-mw);
+                var top=rect.bottom+4;
+                if(top+mh>window.innerHeight-8) top=rect.top-mh-4;
+                floatMenu.style.left=left+'px'; floatMenu.style.top=top+'px';
+                return;
+            }
+            if(!e.target.closest('.floating-menu')) hideMenu();
+        });
+        window.addEventListener('resize', hideMenu);
+        window.addEventListener('scroll', hideMenu, true);
+        floatMenu.querySelectorAll('button').forEach(function(b){
+            b.addEventListener('click', function(){
+                var act=b.getAttribute('data-act'); hideMenu();
+                if(!menuCtx.row) return;
+                if(act==='raise') openRaise(menuCtx.row);
+                else if(act==='bonus') openBonus(menuCtx.row);
+                else if(act==='deduction') openDed(menuCtx.row);
+            });
+        });
+
+        /* ---------------- Modals ---------------- */
+        function openModal(id){ document.getElementById(id).classList.add('open'); }
+        function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+        document.addEventListener('click', function(e){ var c=e.target.closest('[data-close]'); if(c) closeModal(c.getAttribute('data-close')); });
+        // Action modals do not close on backdrop click or Escape — only via Cancel or the "x"
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ hideMenu(); colsWrap.classList.remove('open'); closeAllSelects(); } });
+
+        document.querySelectorAll('.nav-collapsible-header').forEach(function(h){ h.addEventListener('click', function(){ this.parentElement.classList.toggle('open'); }); });
+
+        /* ---------------- Salary-change modals ---------------- */
+        var FULLMON=['January','February','March','April','May','June','July','August','September','October','November','December'];
+        function fmtLong(iso){ var pt=iso.split('-'); var d=pt[2]; if(d.length<2) d='0'+d; return d+' '+FULLMON[parseInt(pt[1],10)-1]+', '+pt[0]; }
+        var modalRow=null;
+
+        var USD_TO_AED=3.67;
+        function setRoundNote(prefix, show){ var el=document.getElementById(prefix+'RoundNote'); if(el) el.style.display = show ? '' : 'none'; }
+        function onAmountChange(prefix){
+            var el=document.getElementById(prefix+'Amount');
+            if(!el || el.readOnly) return; // conversion mode controls its own value/note
+            var v=parseFloat(el.value);
+            if(!isNaN(v) && v % 1 !== 0){ el.value=Math.ceil(v); setRoundNote(prefix, true); }
+            else { setRoundNote(prefix, false); }
+            if(prefix==='raise') updateRaiseNew();
+        }
+        // Configure the currency note + USD->AED conversion UI for a given modal.
+        // prefix: 'raise' | 'add' | 'ded'.  typeWord: 'salary raise' | 'bonus' | 'deduction'
+        function setupCurrencyUI(prefix, r, typeWord){
+            var note=document.getElementById(prefix+'CurNote');
+            var convWrap=document.getElementById(prefix+'ConvWrap');
+            var conv=document.getElementById(prefix+'Conv');
+            var usdGroup=document.getElementById(prefix+'UsdGroup');
+            var usd=document.getElementById(prefix+'Usd');
+            var amount=document.getElementById(prefix+'Amount');
+            var amountLabel=document.getElementById(prefix+'AmountLabel');
+            var baseLabel=amountLabel.getAttribute('data-base') || amountLabel.textContent;
+            amountLabel.setAttribute('data-base', baseLabel);
+            // reset
+            conv.checked=false; usd.value=''; usdGroup.style.display='none';
+            amount.readOnly=false; amount.classList.remove('readonly');
+            amountLabel.innerHTML=baseLabel+' <span class="req">*</span>';
+            note.style.display='none'; convWrap.style.display='none';
+            setRoundNote(prefix, false);
+
+            // Only overseas employees whose currency is not USD get a note
+            if(r.empType==='Overseas' && r.cur!=='USD'){
+                if(r.cur==='AED'){
+                    note.innerHTML=esc(r.name)+'\'s salary is in <b>AED</b>. If your '+typeWord+' amount is in USD, check the box below to automatically convert it to AED.';
+                    note.style.display='block';
+                    convWrap.style.display='flex';
+                } else {
+                    note.innerHTML=esc(r.name)+'\'s salary is in <b>'+esc(r.cur)+'</b>. If your '+typeWord+' amount is in a different currency, please convert it to '+esc(r.cur)+' before submitting.';
+                    note.style.display='block';
+                }
+            }
+        }
+        // Wire the USD->AED conversion behaviour for a modal (called once at init)
+        function wireConversion(prefix, typeWord){
+            var conv=document.getElementById(prefix+'Conv');
+            var usdGroup=document.getElementById(prefix+'UsdGroup');
+            var usd=document.getElementById(prefix+'Usd');
+            var amount=document.getElementById(prefix+'Amount');
+            var amountLabel=document.getElementById(prefix+'AmountLabel');
+            function recalc(){
+                var u=parseFloat(usd.value)||0;
+                amount.value = u>0 ? Math.ceil(u*USD_TO_AED) : '';
+                if(prefix==='raise') updateRaiseNew();
+            }
+            conv.addEventListener('change', function(){
+                var base=amountLabel.getAttribute('data-base');
+                if(conv.checked){
+                    usdGroup.style.display='';
+                    amount.readOnly=true; amount.classList.add('readonly');
+                    amountLabel.innerHTML=base+' — Converted to AED';
+                    recalc();
+                    setRoundNote(prefix, true);   // exception: stays visible under the AED field
+                } else {
+                    usdGroup.style.display='none';
+                    amount.readOnly=false; amount.classList.remove('readonly');
+                    amountLabel.innerHTML=base+' <span class="req">*</span>';
+                    usd.value='';
+                    setRoundNote(prefix, false);
+                }
+            });
+            usd.addEventListener('input', recalc);
+        }
+        function updateRaiseNew(){
+            if(!modalRow) return;
+            var v=Math.ceil(parseFloat(document.getElementById('raiseAmount').value)||0);
+            document.getElementById('raiseNew').textContent=fmt(modalRow.salary+v, modalRow.cur);
+        }
+
+        function openRaise(r){
+            modalRow=r;
+            document.getElementById('raiseName').textContent=r.name;
+            document.getElementById('raiseCur').textContent=r.cur;
+            document.getElementById('raiseCurrent').textContent=fmt(r.salary,r.cur);
+            document.getElementById('raiseNew').textContent=fmt(r.salary,r.cur);
+            document.getElementById('raiseLastDate').textContent=fmtLong(r.lastRaise.date);
+            document.getElementById('raiseLastAmt').textContent=fmt(r.lastRaise.amt,r.cur);
+            document.getElementById('raiseAmount').value='';
+            document.getElementById('raiseReason').value='';
+            setupCurrencyUI('raise', r, 'salary raise');
+            document.getElementById('raiseAsFM').checked=false;
+            document.getElementById('raiseErr').classList.remove('show');
+            openModal('raiseModal');
+        }
+        document.getElementById('raiseAmount').addEventListener('input', updateRaiseNew);
+
+        function openBonus(r){
+            modalRow=r;
+            document.getElementById('addName').textContent=r.name;
+            document.getElementById('addCur').textContent=r.cur;
+            document.getElementById('addCurrent').textContent=fmt(r.salary,r.cur);
+            document.getElementById('addLastDate').textContent=fmtLong(r.lastBonus.date);
+            document.getElementById('addLastAmt').textContent=fmt(r.lastBonus.amt,r.cur);
+            document.getElementById('addAmount').value='';
+            document.getElementById('addPurpose').value='';
+            document.getElementById('addReason').value='';
+            setupCurrencyUI('add', r, 'bonus');
+            document.getElementById('addAsFM').checked=false;
+            document.getElementById('addErr').classList.remove('show');
+            openModal('additionModal');
+        }
+
+        function dedMax(r){ return net(r); } // max new deduction so Net Salary (Salary + Additions − Deductions + New Loans − Loan Repayment) stays ≥ 0
+        function openDed(r){
+            modalRow=r;
+            document.getElementById('dedName').textContent=r.name;
+            document.getElementById('dedCur').textContent=r.cur;
+            document.getElementById('dedCurrent').textContent=fmt(r.salary,r.cur);
+            document.getElementById('dedLastDate').textContent=fmtLong(r.lastDeduction.date);
+            document.getElementById('dedLastAmt').textContent=fmt(r.lastDeduction.amt,r.cur);
+            document.getElementById('dedAmount').value='';
+            document.getElementById('dedPurpose').value='';
+            document.getElementById('dedReason').value='';
+            setupCurrencyUI('ded', r, 'deduction');
+            document.getElementById('dedAsFM').checked=false;
+            document.getElementById('dedErr').classList.remove('show');
+            openModal('deductionModal');
+        }
+
+        function showErr(id,msg){ var e=document.getElementById(id); e.textContent=msg; e.classList.add('show'); }
+
+        function toastHtml(type, html){
+            var wrap=document.getElementById('toastWrap');
+            var icon=type==='success'?'fa-circle-check':(type==='info'?'fa-circle-info':'fa-circle-xmark');
+            var el=document.createElement('div'); el.className='toast '+type;
+            el.innerHTML='<i class="fas '+icon+' ti"></i><div class="tx">'+html+'</div><button class="tc" title="Dismiss"><i class="fas fa-times"></i></button>';
+            wrap.appendChild(el);
+            var t=setTimeout(remove, 6000);
+            function remove(){ clearTimeout(t); if(el.parentNode){ el.style.opacity='0'; el.style.transition='opacity 0.2s'; setTimeout(function(){ if(el.parentNode) el.parentNode.removeChild(el); },200);} }
+            el.querySelector('.tc').addEventListener('click', remove);
+        }
+        function approvalMsg(action, amtTxt, nm, asFinalManager){
+            // action: 'raise' | 'bonus' | 'deduction'
+            var lead;
+            if(action==='raise') lead='Salary raise of <b>'+amtTxt+'</b>';
+            else if(action==='bonus') lead='Bonus of <b>'+amtTxt+'</b>';
+            else lead='Deduction of <b>'+amtTxt+'</b>';
+            if(asFinalManager){
+                // Final managers (Mario / Adeeb / Jad) auto-approve their own requests
+                return lead+' is added for <b>'+nm+'</b> and will be applied to their next salary.';
+            }
+            return lead+' is added for <b>'+nm+'</b> and sent to the final manager for approval.';
+        }
+
+        document.addEventListener('click', function(e){
+            var conf=e.target.closest('[data-confirm]');
+            if(conf){ e.preventDefault(); handleConfirm(conf.getAttribute('data-confirm')); return; }
+            var canc=e.target.closest('[data-cancel]');
+            if(canc){ e.preventDefault(); handleCancel(canc.getAttribute('data-cancel')); return; }
+        });
+
+        function handleCancel(type){
+            var map={ raise:'raiseModal', bonus:'additionModal', deduction:'deductionModal' };
+            var label={ raise:'salary raise', bonus:'bonus', deduction:'deduction' };
+            // If we're editing a pending request, the "x" just aborts the edit and returns to Pending Requests
+            if(editCtx && editCtx.prefix===type){
+                exitEditMode(); closeModal(map[type]); openModal('pendingModal'); return;
+            }
+            closeModal(map[type]);
+            toastHtml('neutral','No action was taken \u2014 the '+label[type]+' was cancelled.');
+        }
+
+        // Detect a duplicate change (same type + exact same amount) within the last 30 days
+        var TYPE_LABEL_TO_HIST={ raise:'Salary Raise', bonus:'Bonus', deduction:'Deduction' };
+        function findDuplicate(row, type, amount){
+            var histType=TYPE_LABEL_TO_HIST[type];
+            var matches=(row.changeHistory||[]).filter(function(c){
+                return c.type===histType && c.amt===amount && within30(c.date);
+            });
+            if(!matches.length) return null;
+            // Prefer showing a pending one if present, else approved; newest first
+            matches.sort(function(a,b){
+                var ap=a.status.indexOf('Pending')===0, bp=b.status.indexOf('Pending')===0;
+                if(ap!==bp) return ap?-1:1;
+                return b.date<a.date?-1:1;
+            });
+            return matches[0];
+        }
+        function dupCopy(type, dup){
+            var noun={ raise:'salary raise', bonus:'bonus', deduction:'deduction' }[type];
+            var pending=dup.status.indexOf('Pending')===0;
+            var cur=modalRow.cur;
+            var amtTxt=fmt(dup.amt,cur);
+            var header, body;
+            if(pending){
+                header='A similar '+noun+' is already awaiting approval';
+                body='This employee already has a '+noun+' pending final manager approval for <b>'+amtTxt+'</b>, submitted on <b>'+esc(dup.date)+'</b>.'
+                   + '<div class="cb-reason">Reason: '+esc(dup.reason||'—')+'</div>'
+                   + '<div class="cb-q">Are you sure you want to add another '+noun+' for the same amount?</div>';
+            } else {
+                header='You may have already added this '+noun;
+                body='This employee already has an approved '+noun+' of <b>'+amtTxt+'</b> that was added on <b>'+esc(dup.date)+'</b>.'
+                   + '<div class="cb-reason">Reason: '+esc(dup.reason||'—')+'</div>'
+                   + '<div class="cb-q">Are you sure you want to add another '+noun+' for the same amount?</div>';
+            }
+            return { header:header, body:body };
+        }
+
+        var pendingSubmit=null; // {type, when, amount, msg, srcModal}
+        function doSubmit(){
+            if(!pendingSubmit) return;
+            var ps=pendingSubmit; pendingSubmit=null;
+            closeModal(ps.srcModal);
+            toastHtml('success', ps.msg);
+        }
+
+        function demoFinalMgr(type){
+            var id={ raise:'raiseAsFM', bonus:'addAsFM', deduction:'dedAsFM' }[type];
+            var el=document.getElementById(id);
+            return !!(el && el.checked);
+        }
+        function handleConfirm(type){
+            if(!modalRow) return;
+            var cur=modalRow.cur, nm=esc(modalRow.name);
+            var amount, msg, srcModal;
+            var asFM=demoFinalMgr(type);
+            if(type==='raise'){
+                amount=Math.ceil(parseFloat(document.getElementById('raiseAmount').value)||0);
+                if(amount<=0){ showErr('raiseErr','Please enter a salary raise amount greater than 0.'); return; }
+                if(!document.getElementById('raiseReason').value.trim()){ showErr('raiseErr','Please enter a reason for this salary raise.'); return; }
+                msg=approvalMsg('raise', fmt(amount,cur), nm, asFM); srcModal='raiseModal';
+            } else if(type==='bonus'){
+                amount=Math.ceil(parseFloat(document.getElementById('addAmount').value)||0);
+                var purpose=document.getElementById('addPurpose').value;
+                if(amount<=0){ showErr('addErr','Please enter a bonus amount greater than 0.'); return; }
+                if(!purpose){ showErr('addErr','Please select a bonus purpose.'); return; }
+                if(!document.getElementById('addReason').value.trim()){ showErr('addErr','Please enter a reason for this bonus.'); return; }
+                msg=approvalMsg('bonus', fmt(amount,cur)+' ('+esc(purpose)+')', nm, asFM); srcModal='additionModal';
+            } else if(type==='deduction'){
+                amount=Math.ceil(parseFloat(document.getElementById('dedAmount').value)||0);
+                var purposeD=document.getElementById('dedPurpose').value;
+                var mx=Math.max(0,dedMax(modalRow));
+                if(amount<=0){ showErr('dedErr','Please enter a deduction amount greater than 0.'); return; }
+                if(amount>mx){ showErr('dedErr','Deduction cannot exceed '+fmt(mx,cur)+'. Net salary cannot be negative.'); return; }
+                if(!purposeD){ showErr('dedErr','Please select a deduction purpose.'); return; }
+                if(!document.getElementById('dedReason').value.trim()){ showErr('dedErr','Please enter a reason for this deduction.'); return; }
+                msg=approvalMsg('deduction', fmt(amount,cur)+' ('+esc(purposeD)+')', nm, asFM); srcModal='deductionModal';
+            }
+            pendingSubmit={ type:type, amount:amount, msg:msg, srcModal:srcModal };
+            var dup=findDuplicate(modalRow, type, amount);
+            if(dup){
+                var copy=dupCopy(type, dup);
+                document.getElementById('dupTitle').textContent=copy.header;
+                document.getElementById('dupBody').innerHTML=copy.body;
+                openModal('dupModal');
+                return;
+            }
+            doSubmit();
+        }
+
+        // Duplicate-confirm modal buttons
+        document.getElementById('dupConfirm').addEventListener('click', function(){ closeModal('dupModal'); doSubmit(); });
+        function dupCancelFn(){ closeModal('dupModal'); pendingSubmit=null; } // keep the underlying action modal open to edit
+        document.getElementById('dupCancel').addEventListener('click', dupCancelFn);
+        document.getElementById('dupClose').addEventListener('click', dupCancelFn);
+
+        /* ---------------- Payroll history modal ---------------- */
+        function statusBadge(st){
+            var pending=st.indexOf('Pending')===0;
+            return '<span class="badge '+(pending?'badge-pending':'badge-approved')+'">'+esc(st)+'</span>';
+        }
+        // pending first, then approved; within each group newest date first
+        function sortByStatusThenDate(rows){
+            return rows.slice().sort(function(a,b){
+                var ap=a.status.indexOf('Pending')===0, bp=b.status.indexOf('Pending')===0;
+                if(ap!==bp) return ap?-1:1;
+                return b.date<a.date?-1:1;
+            });
+        }
+        function openHistory(row){
+            document.getElementById('histTitle').textContent=row.name+"'s Payroll History";
+            document.getElementById('histPrevNet').textContent = row.noPrevSalary ? 'No salary record was found' : fmt(row.prevNet, row.cur);
+
+            var cb=document.getElementById('histChangesBody');
+            var changes=sortByStatusThenDate(row.changeHistory||[]);
+            if(!changes.length){
+                cb.innerHTML='<tr><td colspan="7"><div class="hist-empty">No payroll changes on record.</div></td></tr>';
+            } else {
+                cb.innerHTML=changes.map(function(c){
+                    return '<tr>'
+                        +'<td>'+esc(c.date)+'</td>'
+                        +'<td class="ht-type">'+esc(c.type)+'</td>'
+                        +'<td>'+(c.purpose?esc(c.purpose):'—')+'</td>'
+                        +'<td class="ht-amt">'+fmt(c.amt,row.cur)+'</td>'
+                        +'<td>'+esc(c.reason||'—')+'</td>'
+                        +'<td>'+esc(c.manager)+'</td>'
+                        +'<td>'+statusBadge(c.status)+'</td>'
+                        +'</tr>';
+                }).join('');
+            }
+
+            var lb=document.getElementById('histLoansBody');
+            var loans=sortByStatusThenDate(row.loanHistory||[]);
+            if(!loans.length){
+                lb.innerHTML='<tr><td colspan="6"><div class="hist-empty">No loans on record.</div></td></tr>';
+            } else {
+                lb.innerHTML=loans.map(function(l){
+                    return '<tr>'
+                        +'<td>'+esc(l.date)+'</td>'
+                        +'<td>'+esc(l.type)+'</td>'
+                        +'<td class="ht-amt">'+fmt(l.amt,row.cur)+'</td>'
+                        +'<td class="ht-amt">'+fmt(l.monthly,row.cur)+'</td>'
+                        +'<td>'+esc(l.desc||'—')+'</td>'
+                        +'<td>'+statusBadge(l.status)+'</td>'
+                        +'</tr>';
+                }).join('');
+            }
+
+            openModal('historyModal');
+            // After paint, cap each table height for max display then let it scroll
+            requestAnimationFrame(function(){ capHistTable('histChangesWrap'); capHistTable('histLoansWrap'); });
+        }
+        function capHistTable(wrapId){
+            var wrap=document.getElementById(wrapId);
+            if(!wrap) return;
+            wrap.style.maxHeight='';            // dynamic: shrink to content
+            var max= wrapId==='histLoansWrap' ? 200 : 320; // loans smaller, changes larger
+            wrap.style.maxHeight=max+'px';      // and scroll past the cap
+        }
+
+        // Clicking an employee name opens their history
+        document.addEventListener('click', function(e){
+            var link=e.target.closest('.emp-name-link');
+            if(link){ e.preventDefault(); var row=ROWS_BY_ID[link.getAttribute('data-history-id')]; if(row) openHistory(row); }
+        });
+
+        /* ---------------- Pending Requests tab ---------------- */
+        var TYPE_TO_MODAL={ 'Salary Raise':'raise', 'Bonus':'bonus', 'Deduction':'deduction' };
+        function pendingTypeLabel(t){ return t; }
+        function renderPending(){
+            var tb=document.getElementById('pendingBody');
+            document.getElementById('pendingCount').textContent=PENDING.length;
+            if(!PENDING.length){ tb.innerHTML='<tr><td colspan="7"><div class="hist-empty">No pending requests across your team.</div></td></tr>'; return; }
+            tb.innerHTML=PENDING.map(function(pr){
+                return '<tr>'
+                    +'<td><a href="#" class="emp-name-link" data-history-id="'+pr.empId+'">'+esc(pr.name)+'</a></td>'
+                    +'<td>'+esc(pr.date)+'</td>'
+                    +'<td class="ht-type">'+esc(pr.type)+'</td>'
+                    +'<td>'+(pr.purpose?esc(pr.purpose):'\u2014')+'</td>'
+                    +'<td class="ht-amt mask-amt">'+fmt(pr.amt,pr.cur)+'</td>'
+                    +'<td>'+esc(pr.reason||'\u2014')+'</td>'
+                    +'<td><button type="button" class="pend-act-btn edit" data-edit-pid="'+pr.pid+'"><i class="fas fa-pen"></i> Edit</button> '
+                       +'<button type="button" class="pend-act-btn danger" data-del-pid="'+pr.pid+'"><i class="fas fa-trash"></i> Delete</button></td>'
+                    +'</tr>';
+            }).join('');
+        }
+        function openPending(){ buildPending(); renderPending(); openModal('pendingModal'); }
+
+        // Delegated actions inside the pending table
+        document.getElementById('pendingBody').addEventListener('click', function(e){
+            var del=e.target.closest('[data-del-pid]');
+            if(del){ startDelete(parseInt(del.getAttribute('data-del-pid'),10)); return; }
+            var ed=e.target.closest('[data-edit-pid]');
+            if(ed){ startEdit(parseInt(ed.getAttribute('data-edit-pid'),10)); return; }
+        });
+
+        /* ----- Delete flow ----- */
+        var delPid=null;
+        function startDelete(pid){
+            var pr=pendingById(pid); if(!pr) return;
+            delPid=pid;
+            document.getElementById('delSummary').innerHTML='<b>'+esc(pr.name)+'</b> \u2014 '+esc(pr.type)+(pr.purpose?' ('+esc(pr.purpose)+')':'')+'<br>Amount: <b>'+fmt(pr.amt,pr.cur)+'</b>'+(pr.reason?'<br>Reason: '+esc(pr.reason):'');
+            document.getElementById('delReason').value='';
+            document.getElementById('delErr').classList.remove('show');
+            openModal('delModal');
+        }
+        function closeDelete(){ closeModal('delModal'); delPid=null; }
+        document.getElementById('delCancel').addEventListener('click', closeDelete);
+        document.getElementById('delClose').addEventListener('click', closeDelete);
+        document.getElementById('delConfirm').addEventListener('click', function(){
+            var pr=pendingById(delPid); if(!pr) return;
+            var reason=document.getElementById('delReason').value.trim();
+            if(!reason){ showErr('delErr','Please enter a reason for deleting this request.'); return; }
+            // Remove from source change-history + rebuild buckets/pending
+            removePendingRecord(pr);
+            closeModal('delModal');
+            buildPending(); renderPending(); rebuildPendingBuckets(pr.empId); renderTable();
+            toastHtml('success','The pending '+pr.type.toLowerCase()+' of <b>'+fmt(pr.amt,pr.cur)+'</b> for <b>'+esc(pr.name)+'</b> has been deleted. Payroll will remove it from the manager notes and the final manager\'s pending approvals, and notify the payroll handler.');
+            delPid=null;
+        });
+
+        function removePendingRecord(pr){
+            var r=ROWS_BY_ID[pr.empId]; if(!r) return;
+            var idx=r.changeHistory.indexOf(pr._src);
+            if(idx>-1) r.changeHistory.splice(idx,1);
+        }
+        function rebuildPendingBuckets(empId){
+            var r=ROWS_BY_ID[empId]; if(!r) return;
+            r.pending={ additions:[], deductions:[], newLoans:[], raise:0, reduction:0 };
+            (r.changeHistory||[]).forEach(function(c){
+                if(c.status.indexOf('Pending')!==0) return;
+                if(c.type==='Bonus') r.pending.additions.push({ amt:c.amt, reason:(c.purpose||c.reason||'bonus') });
+                else if(c.type==='Deduction') r.pending.deductions.push({ amt:c.amt, reason:(c.purpose||c.reason||'deduction') });
+                else if(c.type==='Salary Raise') r.pending.raise+=c.amt;
+                else if(c.type==='Salary Reduction') r.pending.reduction+=c.amt;
+            });
+        }
+
+        /* ----- Edit flow (opens matching modal in edit-mode, prefilled) ----- */
+        var editCtx=null; // { pid, type, prefix, orig:{amt,purpose,reason} }
+        function startEdit(pid){
+            var pr=pendingById(pid); if(!pr) return;
+            var r=ROWS_BY_ID[pr.empId]; if(!r) return;
+            var which=TYPE_TO_MODAL[pr.type];
+            editCtx={ pid:pid, type:pr.type, prefix:which, empId:pr.empId, orig:{ amt:pr.amt, purpose:pr.purpose||'', reason:pr.reason||'' } };
+            if(which==='raise') openRaise(r); else if(which==='bonus') openBonus(r); else openDed(r);
+            enterEditMode(which, pr);
+        }
+        function enterEditMode(which, pr){
+            var idp = which==='raise'?'raise':(which==='bonus'?'add':'ded');
+            var modalId = which==='raise'?'raiseModal':(which==='bonus'?'additionModal':'deductionModal');
+            var overlayEl=document.getElementById(modalId);
+            overlayEl.classList.add('editing-overlay'); // sit above the Pending Requests modal
+            var modalEl=overlayEl.querySelector('.modal');
+            modalEl.classList.add('edit-mode');
+            // keep the Pending Requests modal open behind this edit form
+            openModal('pendingModal');
+            // update header to "Edit ..."
+            var head=modalEl.querySelector('.modal-header h3');
+            head.setAttribute('data-add', head.innerHTML);
+            var typeWord = which==='raise'?'Salary Raise':(which==='bonus'?'Bonus':'Deduction');
+            head.innerHTML='<i class="fas fa-pen" style="color:var(--primary-color);"></i> Edit '+typeWord+' for '+esc(pr.name);
+            // prefill fields
+            document.getElementById(idp+'Amount').value=pr.amt;
+            if(idp==='add'){ document.getElementById('addPurpose').value=pr.purpose||''; document.getElementById('addReason').value=pr.reason||''; }
+            if(idp==='ded'){ document.getElementById('dedPurpose').value=pr.purpose||''; document.getElementById('dedReason').value=pr.reason||''; }
+            if(idp==='raise'){ document.getElementById('raiseReason').value=pr.reason||''; updateRaiseNew(); }
+            checkEditDirty();
+        }
+        function exitEditMode(){
+            ['raiseModal','additionModal','deductionModal'].forEach(function(mid){
+                var overlayEl=document.getElementById(mid);
+                overlayEl.classList.remove('editing-overlay');
+                var modalEl=overlayEl.querySelector('.modal');
+                modalEl.classList.remove('edit-mode');
+                var head=modalEl.querySelector('.modal-header h3');
+                if(head.getAttribute('data-add')){ head.innerHTML=head.getAttribute('data-add'); head.removeAttribute('data-add'); }
+            });
+            editCtx=null;
+        }
+        // Determine whether the edit form differs from the original values
+        function currentEditValues(){
+            var p=editCtx.prefix; var idp=p==='raise'?'raise':(p==='bonus'?'add':'ded');
+            return {
+                amt: Math.ceil(parseFloat(document.getElementById(idp+'Amount').value)||0),
+                purpose: idp==='raise'?'':document.getElementById(idp+'Purpose').value,
+                reason: document.getElementById(idp+'Reason').value.trim()
+            };
+        }
+        function checkEditDirty(){
+            if(!editCtx) return;
+            var cur=currentEditValues(), o=editCtx.orig;
+            var dirty = cur.amt!==o.amt || cur.purpose!==(o.purpose||'') || cur.reason!==(o.reason||'').trim();
+            var modalId = editCtx.prefix==='raise'?'raiseModal':(editCtx.prefix==='bonus'?'additionModal':'deductionModal');
+            var upd=document.getElementById(modalId).querySelector('[data-editupdate]');
+            if(upd) upd.disabled = !dirty;
+        }
+        // Wire change-detection on all edit inputs
+        ['raise','add','ded'].forEach(function(idp){
+            var amt=document.getElementById(idp+'Amount'); if(amt) amt.addEventListener('input', checkEditDirty);
+            var rsn=document.getElementById(idp+'Reason'); if(rsn) rsn.addEventListener('input', checkEditDirty);
+            var pur=document.getElementById(idp+'Purpose'); if(pur) pur.addEventListener('change', checkEditDirty);
+        });
+        // Edit-footer buttons (delegated)
+        document.addEventListener('click', function(e){
+            var c=e.target.closest('[data-editcancel]');
+            if(c){ e.preventDefault(); var mid=editModalId(); exitEditMode(); if(mid) closeModal(mid); openModal('pendingModal'); return; }
+            var u=e.target.closest('[data-editupdate]');
+            if(u){ e.preventDefault(); if(u.disabled) return; openUpdateConfirm(); return; }
+        });
+        function editModalId(){ if(!editCtx) return null; return editCtx.prefix==='raise'?'raiseModal':(editCtx.prefix==='bonus'?'additionModal':'deductionModal'); }
+
+        /* ----- Update confirmation ----- */
+        function openUpdateConfirm(){
+            // validate required fields first (reuse basic checks)
+            var v=currentEditValues();
+            var errId = editCtx.prefix==='raise'?'raiseErr':(editCtx.prefix==='bonus'?'addErr':'dedErr');
+            if(v.amt<=0){ showErr(errId,'Please enter an amount greater than 0.'); return; }
+            if(editCtx.prefix!=='raise' && !v.purpose){ showErr(errId,'Please select a purpose.'); return; }
+            if(!v.reason){ showErr(errId,'Please enter a reason.'); return; }
+            document.getElementById('updReason').value='';
+            openModal('updModal');
+        }
+        function closeUpd(){ closeModal('updModal'); }
+        document.getElementById('updCancel').addEventListener('click', closeUpd);
+        document.getElementById('updClose').addEventListener('click', closeUpd);
+        document.getElementById('updConfirm').addEventListener('click', function(){
+            var pr=pendingById(editCtx.pid); if(!pr){ closeUpd(); return; }
+            var v=currentEditValues();
+            var prevAmt=pr.amt, prevPurpose=pr.purpose, prevReason=pr.reason;
+            // apply to the source record
+            pr._src.amt=v.amt; pr._src.reason=v.reason;
+            if(editCtx.prefix!=='raise') pr._src.purpose=v.purpose;
+            var editReason=document.getElementById('updReason').value.trim();
+            closeModal('updModal');
+            var mid=editModalId(); exitEditMode(); if(mid) closeModal(mid);
+            buildPending(); renderPending(); rebuildPendingBuckets(pr.empId); renderTable();
+            openModal('pendingModal');
+            toastHtml('success','The pending '+pr.type.toLowerCase()+' for <b>'+esc(pr.name)+'</b> has been updated'+(editReason?'':'')+'. Payroll will update the manager note and the final manager\'s pending approvals, and notify the payroll handler.');
+        });
+
+        /* ---------------- Agents' Bonuses tab ---------------- */
+        var BONUS_PURPOSE_OPTS=['Bonus','Equipment','Salary Dispute','Transportation Fare Reimbursement','Retail Incentive','Low Exchange Rate Compensation','Prorated Salary','Cash Advance','Final Settlement'];
+        var agentsState={ rows:[], dirty:false, submitted:false };
+        function isAgent(r){ return (r.titleMain||'').trim().toLowerCase()==='agent'; }
+        function buildAgents(){
+            // Reuse the roster data; agents = job title exactly "Agent"
+            agentsState.rows = ALL.filter(isAgent).map(function(r){
+                return { id:r._id, name:r.name, manager:r.manager, dept:(r.dept||[]).join(', '), title:r.titleMain, empType:r.empType, salary:r.salary, cur:r.cur, purpose:'', amount:'', selected:false };
+            }).sort(function(a,b){ return a.manager.localeCompare(b.manager) || a.name.localeCompare(b.name); });
+            agentsState.dirty=false; agentsState.submitted=false;
+        }
+        function purposeSelectHtml(a){
+            var opts='<option value="">-- Select --</option>'+BONUS_PURPOSE_OPTS.map(function(o){ return '<option'+(a.purpose===o?' selected':'')+'>'+o+'</option>'; }).join('');
+            return '<select class="cell-purpose" data-aid="'+a.id+'"'+(agentsState.submitted?' disabled':'')+'>'+opts+'</select>';
+        }
+        function renderAgents(){
+            var tb=document.getElementById('agentsBody');
+            if(!agentsState.rows.length){ tb.innerHTML='<tr><td colspan="8"><div class="hist-empty">No agents found in your team.</div></td></tr>'; return; }
+            tb.innerHTML=agentsState.rows.map(function(a){
+                return '<tr>'
+                    +'<td><input type="checkbox" class="agent-sel" data-aid="'+a.id+'"'+(a.selected?' checked':'')+(agentsState.submitted?' disabled':'')+'></td>'
+                    +'<td><a href="#" class="emp-name-link" data-history-id="'+a.id+'">'+esc(a.name)+'</a></td>'
+                    +'<td>'+esc(a.manager)+'</td>'
+                    +'<td>'+esc(a.dept)+'</td>'
+                    +'<td>'+esc(a.title)+'</td>'
+                    +'<td>'+typeBadge(a.empType)+'</td>'
+                    +'<td class="num mask-amt">'+fmt(a.salary,a.cur)+'</td>'
+                    +'<td><div class="bonus-cell">'+purposeSelectHtml(a)+'<span class="cur-mini">'+esc(a.cur)+'</span><input type="number" min="0" step="1" class="cell-amt mask-amt" data-aid="'+a.id+'" value="'+(a.amount!==''?a.amount:'')+'" placeholder="0"'+(agentsState.submitted?' disabled':'')+'></div></td>'
+                    +'</tr>';
+            }).join('');
+            syncAgentsUI();
+        }
+        function agentById(id){ return agentsState.rows.filter(function(a){ return a.id===id; })[0]; }
+        function selectedAgents(){ return agentsState.rows.filter(function(a){ return a.selected; }); }
+        function syncAgentsUI(){
+            var sel=selectedAgents().length, total=agentsState.rows.length;
+            document.getElementById('btnSetPurpose').disabled = sel===0 || agentsState.submitted;
+            document.getElementById('agentsSelCount').textContent = sel? (sel+' selected') : '';
+            var all=document.getElementById('agentsSelAll'); if(all){ all.checked = total>0 && sel===total; all.disabled=agentsState.submitted; }
+            document.getElementById('agentsSave').disabled = !agentsState.dirty || agentsState.submitted;
+            document.getElementById('agentsSubmit').disabled = agentsState.submitted;
+            var st=document.getElementById('agentsStatus');
+            if(agentsState.submitted){ st.textContent='Submitted to payroll'; st.className='agents-status submitted'; }
+            else if(!agentsState.dirty){ st.textContent=''; st.className='agents-status'; }
+            else { st.textContent='Unsaved changes'; st.className='agents-status'; }
+        }
+        function openAgents(){ buildAgents(); renderAgents(); openModal('agentsModal'); }
+
+        // Editable cells (delegated)
+        document.getElementById('agentsBody').addEventListener('input', function(e){
+            var amt=e.target.closest('.cell-amt');
+            if(amt){ var a=agentById(parseInt(amt.getAttribute('data-aid'),10)); if(a){ a.amount=amt.value; agentsState.dirty=true; syncAgentsUI(); } }
+        });
+        document.getElementById('agentsBody').addEventListener('change', function(e){
+            var amt=e.target.closest('.cell-amt');
+            if(amt){ var a=agentById(parseInt(amt.getAttribute('data-aid'),10)); if(a){ var v=parseFloat(amt.value); if(!isNaN(v)&&v>0){ a.amount=Math.ceil(v); amt.value=a.amount; } else if(amt.value===''){ a.amount=''; } agentsState.dirty=true; syncAgentsUI(); } return; }
+            var pur=e.target.closest('.cell-purpose');
+            if(pur){ var a2=agentById(parseInt(pur.getAttribute('data-aid'),10)); if(a2){ a2.purpose=pur.value; agentsState.dirty=true; syncAgentsUI(); } return; }
+            var sel=e.target.closest('.agent-sel');
+            if(sel){ var a3=agentById(parseInt(sel.getAttribute('data-aid'),10)); if(a3){ a3.selected=sel.checked; syncAgentsUI(); } return; }
+        });
+        // Select all
+        document.getElementById('agentsSelAll').addEventListener('change', function(){
+            var check = !(selectedAgents().length===agentsState.rows.length); // if not all selected -> select all; else clear
+            agentsState.rows.forEach(function(a){ a.selected=check; });
+            renderAgents();
+        });
+
+        /* ----- Set Bonus Purpose (bulk) ----- */
+        document.getElementById('btnSetPurpose').addEventListener('click', function(){
+            if(this.disabled) return;
+            document.getElementById('setPurposeIntro').textContent='Apply a bonus purpose to the '+selectedAgents().length+' selected agent(s).';
+            document.getElementById('bulkPurpose').value='';
+            document.getElementById('setPurposeErr').classList.remove('show');
+            openModal('setPurposeModal');
+        });
+        function closeSetPurpose(){ closeModal('setPurposeModal'); }
+        document.getElementById('setPurposeCancel').addEventListener('click', closeSetPurpose);
+        document.getElementById('setPurposeClose').addEventListener('click', closeSetPurpose);
+        document.getElementById('setPurposeConfirm').addEventListener('click', function(){
+            var v=document.getElementById('bulkPurpose').value;
+            if(!v){ showErr('setPurposeErr','Please select a bonus purpose.'); return; }
+            selectedAgents().forEach(function(a){ a.purpose=v; });
+            agentsState.dirty=true;
+            closeModal('setPurposeModal');
+            renderAgents();
+        });
+
+        /* ----- Discard / Save / Submit ----- */
+        function leaveAgents(){ closeModal('agentsModal'); }
+        document.getElementById('agentsClose').addEventListener('click', function(){ attemptDiscard(); });
+        document.getElementById('agentsDiscard').addEventListener('click', function(){ attemptDiscard(); });
+        function attemptDiscard(){
+            if(agentsState.dirty && !agentsState.submitted){ openModal('agentsDiscardModal'); }
+            else { leaveAgents(); }
+        }
+        document.getElementById('agentsDiscardCancel').addEventListener('click', function(){ closeModal('agentsDiscardModal'); });
+        document.getElementById('agentsDiscardClose').addEventListener('click', function(){ closeModal('agentsDiscardModal'); });
+        document.getElementById('agentsDiscardConfirm').addEventListener('click', function(){ closeModal('agentsDiscardModal'); leaveAgents(); });
+
+        document.getElementById('agentsSave').addEventListener('click', function(){
+            if(this.disabled) return;
+            agentsState.dirty=false; syncAgentsUI();
+            toastHtml('success','Your agent bonus changes have been saved. You can keep editing or submit them to payroll when ready.');
+        });
+
+        document.getElementById('agentsSubmit').addEventListener('click', function(){
+            if(this.disabled) return;
+            openModal('agentsSubmitModal');
+        });
+        document.getElementById('agentsSubmitCancel').addEventListener('click', function(){ closeModal('agentsSubmitModal'); });
+        document.getElementById('agentsSubmitClose').addEventListener('click', function(){ closeModal('agentsSubmitModal'); });
+        document.getElementById('agentsSubmitConfirm').addEventListener('click', function(){
+            var withBonus=agentsState.rows.filter(function(a){ return a.amount!=='' && Number(a.amount)>0 && a.purpose; });
+            agentsState.submitted=true; agentsState.dirty=false;
+            closeModal('agentsSubmitModal');
+            renderAgents();
+            // In production the tab would disappear; for the demo we return to the main table.
+            closeModal('agentsModal');
+            toastHtml('success', withBonus.length+' agent bonus(es) have been sent to the Office Staff Payroll module for approval. In production, the Agents\' Bonuses page would now be unavailable until the next cycle.');
+        });
+
+        // Tab buttons that open overlays (Pending Requests / Agents' Bonuses)
+        document.getElementById('btnPending').addEventListener('click', function(){ openPending(); });
+        document.getElementById('btnAgents').addEventListener('click', function(){ openAgents(); });
+
+        /* ---------------- Init ---------------- */
+        document.getElementById('raiseAmountLabel').setAttribute('data-base','Salary Raise Amount');
+        document.getElementById('addAmountLabel').setAttribute('data-base','Bonus Amount');
+        document.getElementById('dedAmountLabel').setAttribute('data-base','Deduction Amount');
+        wireConversion('raise','salary raise'); wireConversion('add','bonus'); wireConversion('ded','deduction');
+        document.getElementById('raiseAmount').addEventListener('change', function(){ onAmountChange('raise'); });
+        document.getElementById('addAmount').addEventListener('change', function(){ onAmountChange('add'); });
+        document.getElementById('dedAmount').addEventListener('change', function(){ onAmountChange('ded'); });
+        buildAddlFilters(); buildColOptions(); refreshTabCounts(); refreshSelects(); renderTable();
+        requestAnimationFrame(layout);
+    })();
+    </script>
+</body>
+</html>
