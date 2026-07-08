@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Team Roster - Maids.cc Access & Services</title>
+    <title>Payroll Roster - Maids.cc Access & Services</title>
     <link rel="stylesheet" href="https://my.maidstech.ai/assets/css/style.css">
     <link rel="stylesheet" href="https://my.maidstech.ai/assets/css/pages.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
     :root {
         --primary-color: #6366f1; --primary-hover: #4f46e5;
-        --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #64748b;
+        --text-primary: #1e293b; --text-secondary: #64748b; --text-muted: #94a3b8;
         --border-color: #e2e8f0; --bg-card: #ffffff; --bg-secondary: #f8fafc;
         --bg-tertiary: #f3f4f6; --bg-hover: rgba(99,102,241,0.06); --page-bg: #f1f5f9;
     }
@@ -60,11 +60,15 @@
     @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
 
     /* ---------- Buttons ---------- */
-    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; font-family: inherit; transition: all 0.15s; text-decoration: none; }
-    .btn-primary { background: var(--primary-color); color: #fff; }
-    .btn-primary:hover { background: var(--primary-hover); }
+    .btn { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.55rem 1rem; border-radius: 0.5rem; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: 1px solid transparent; font-family: inherit; transition: background 0.15s, border-color 0.15s, color 0.15s, box-shadow 0.15s, transform 0.05s; text-decoration: none; }
+    .btn:active { transform: translateY(1px); }
+    .btn-primary { background: var(--primary-color); color: #fff; box-shadow: 0 1px 2px rgba(79,70,229,0.25); }
+    .btn-primary:hover { background: var(--primary-hover); box-shadow: 0 2px 8px rgba(79,70,229,0.28); }
     .btn-outline { background: #fff; color: var(--text-primary); border-color: var(--border-color); }
-    .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); }
+    .btn-outline:hover { border-color: var(--primary-color); color: var(--primary-color); background: var(--bg-hover); }
+    .btn:disabled, .btn[disabled] { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+    .btn:disabled:hover, .btn[disabled]:hover { background: #fff; border-color: var(--border-color); color: var(--text-primary); transform: none; }
+    .btn-primary:disabled:hover { background: var(--primary-color); }
     .btn-sm { padding: 0.4rem 0.7rem; font-size: 0.8rem; }
 
     /* ---------- Info banner ---------- */
@@ -322,7 +326,6 @@
     .edit-footer { display: none; justify-content: flex-end; gap: 0.5rem; }
     .modal.edit-mode .add-footer { display: none; }
     .modal.edit-mode .edit-footer { display: flex; }
-    .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
     /* Agents toolbar */
     .agents-toolbar { display: flex; align-items: center; gap: 0.85rem; margin-bottom: 0.85rem; }
     .agents-selcount { font-size: 0.78rem; color: var(--primary-hover); font-weight: 700; background: rgba(99,102,241,0.08); padding: 0.25rem 0.65rem; border-radius: 999px; }
@@ -350,14 +353,30 @@
     table.agents-table select.cell-purpose:hover { border-color: var(--primary-color); }
     table.agents-table select.cell-purpose:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
     table.agents-table select.cell-purpose:invalid, table.agents-table select.cell-purpose option[value=""] { color: var(--text-muted); }
-    .bonus-cell { display: flex; align-items: center; gap: 0.4rem; }
-    .bonus-cell .cell-purpose { flex: 1 1 58%; min-width: 0; }
-    .bonus-cell .amt-wrap { flex: 1 1 42%; position: relative; min-width: 92px; }
-    .bonus-cell .cur-mini { position: absolute; left: 0.55rem; top: 50%; transform: translateY(-50%); font-size: 0.62rem; font-weight: 700; color: var(--text-muted); pointer-events: none; letter-spacing: 0.02em; z-index: 1; }
-    .bonus-cell input.cell-amt { width: 100%; box-sizing: border-box; font-size: 0.8rem; font-weight: 600; padding: 0.4rem 0.5rem 0.4rem 2.7rem; border: 1px solid var(--border-color); border-radius: 0.45rem; font-family: inherit; text-align: right; font-variant-numeric: tabular-nums; transition: border-color 0.12s, box-shadow 0.12s; }
-    .bonus-cell input.cell-amt:hover { border-color: var(--primary-color); }
-    .bonus-cell input.cell-amt:focus { outline: none; border-color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99,102,241,0.12); }
-    .bonus-cell input.cell-amt::placeholder { color: #cbd5e1; font-weight: 400; }
+    /* Unified editable table field (incentive amount, overtime hours, multiplier) */
+    .edit-field { position: relative; display: flex; align-items: center; background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; transition: border-color 0.15s, box-shadow 0.15s, background 0.15s; overflow: hidden; }
+    .edit-field:hover { border-color: #a5b4fc; background: #fff; }
+    .edit-field:focus-within { border-color: var(--primary-color); background: #fff; box-shadow: 0 0 0 3px rgba(99,102,241,0.14); }
+    .edit-field input { flex: 1 1 auto; min-width: 0; width: 100%; box-sizing: border-box; border: none; background: transparent; font-family: inherit; font-size: 0.82rem; font-weight: 600; color: var(--text-primary); padding: 0.42rem 0.55rem; text-align: right; font-variant-numeric: tabular-nums; }
+    .edit-field input:focus { outline: none; }
+    .edit-field input::placeholder { color: #cbd5e1; font-weight: 400; }
+    .edit-field input:disabled { color: var(--text-muted); -webkit-text-fill-color: var(--text-muted); }
+    .edit-field .edit-prefix { flex: 0 0 auto; display: inline-flex; align-items: center; padding: 0 0.5rem; align-self: stretch; font-size: 0.66rem; font-weight: 700; color: var(--text-secondary); background: rgba(99,102,241,0.07); border-right: 1px solid var(--border-color); letter-spacing: 0.02em; }
+    .edit-field .edit-unit { flex: 0 0 auto; padding: 0 0.6rem 0 0.3rem; font-size: 0.72rem; font-weight: 600; color: var(--text-muted); }
+    .edit-field.field-mult .edit-prefix { font-size: 0.9rem; color: var(--primary-color); padding: 0 0.4rem; }
+    .edit-field.field-mult { max-width: 118px; }
+    .edit-field.field-mult input { text-align: center; padding: 0.42rem 0.4rem; }
+    .edit-field.field-hours { max-width: 104px; }
+    /* Hide native number spinners on the compact table inputs for a clean, consistent look */
+    .edit-field input::-webkit-outer-spin-button,
+    .edit-field input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    .edit-field input[type=number] { -moz-appearance: textfield; appearance: textfield; }
+    /* Overtime amount = computed/read-only, visually distinct from editable fields */
+    td.ot-amt-cell { text-align: right; }
+    .ot-amt-val { display: inline-block; font-weight: 700; font-size: 0.82rem; color: var(--primary-hover); font-variant-numeric: tabular-nums; background: rgba(99,102,241,0.08); padding: 0.22rem 0.55rem; border-radius: 0.4rem; }
+    .ot-amt-empty { color: var(--text-muted); }
+    /* keep the incentives currency prefix compact */
+    .edit-field.field-amt .edit-prefix { min-width: 2.4rem; justify-content: center; }
     table.agents-table input[type=checkbox], #agentsSelAll { accent-color: var(--primary-color); cursor: pointer; width: 16px; height: 16px; }
     table.agents-table td:first-child, table.agents-table th:first-child { text-align: center; }
     .agents-footer { gap: 0.5rem; }
@@ -373,14 +392,17 @@
     .fullscreen-panel .fs-subtitle { font-size: 0.82rem; color: var(--text-secondary); }
     .fullscreen-panel .fs-header .close-x { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 1.2rem; padding: 0.4rem; border-radius: 0.5rem; line-height: 1; transition: color 0.12s, background 0.12s; }
     .fullscreen-panel .fs-header .close-x:hover { color: var(--text-primary); background: var(--bg-tertiary); }
+    .fullscreen-panel .fs-header-actions { display: flex; align-items: center; gap: 0.5rem; }
     .fullscreen-panel .fs-body { flex: 1 1 auto; overflow: hidden; padding: 1.25rem 1.75rem 0; display: flex; flex-direction: column; min-height: 0; }
     .fullscreen-panel .agents-banner { margin-bottom: 1rem; }
-    .fullscreen-panel .fs-footer { flex: 0 0 auto; display: flex; align-items: center; gap: 0.5rem; padding: 0.9rem 1.75rem; background: #fff; border-top: 1px solid var(--border-color); box-shadow: 0 -1px 2px rgba(15,23,42,0.04); }
-    .fullscreen-panel .fs-footer #agentsDiscard { margin-right: auto; }  /* destructive on the left */
+    .fullscreen-panel .fs-footer { flex: 0 0 auto; display: flex; align-items: center; justify-content: flex-end; gap: 0.5rem; padding: 0.9rem 1.75rem; background: #fff; border-top: 1px solid var(--border-color); box-shadow: 0 -1px 2px rgba(15,23,42,0.04); }
     .fullscreen-panel .agents-toolbar { flex: 0 0 auto; }
     .fullscreen-panel .agents-wrap { flex: 1 1 auto; min-height: 0; overflow-y: auto; overflow-x: hidden; margin-bottom: 1.25rem; background: #fff; box-shadow: 0 1px 3px rgba(15,23,42,0.05); }
     /* When an action modal is opened to edit a pending request, it must sit above the Pending Requests modal */
     #raiseModal.editing-overlay, #additionModal.editing-overlay, #deductionModal.editing-overlay { z-index: 10005 !important; background: rgba(15,23,42,0.35); }
+    #updModal { z-index: 10015 !important; }
+    #dupModal.over-edit { z-index: 10020 !important; }
+    #historyModal.over-pending { z-index: 10010 !important; }
     </style>
 </head>
 <body>
@@ -398,7 +420,7 @@
                     <div class="nav-collapsible-header"><i class="fas fa-users-cog"></i> Team Management <i class="fas fa-chevron-down nav-collapse-icon"></i></div>
                     <div class="nav-collapsible-body">
                         <a href="https://my.maidstech.ai/manager_dashboard.php" class="nav-item"><i class="fas fa-tachometer-alt"></i> Manager Dashboard</a>
-                        <a href="https://my.maidstech.ai/team_roster.php" class="nav-item active"><i class="fas fa-clipboard-list"></i> Team Roster</a>
+                        <a href="https://my.maidstech.ai/team_roster.php" class="nav-item active"><i class="fas fa-clipboard-list"></i> Payroll Roster</a>
                         <a href="https://my.maidstech.ai/manager_guide.php" class="nav-item"><i class="fas fa-book-open"></i> Manager's Guide</a>
                     </div>
                 </div>
@@ -425,7 +447,7 @@
 
         <main class="main-content">
             <header class="header">
-                <h1 class="header-title">Team Roster</h1>
+                <h1 class="header-title">Payroll Roster</h1>
                 <div class="user-menu">
                     <a href="https://org.maidstech.ai/org-chart" target="_blank" rel="noopener noreferrer" class="header-icon-btn" title="Org Chart"><i class="fas fa-sitemap"></i></a>
                     <button type="button" class="user-dropdown-toggle">
@@ -515,7 +537,8 @@
                     <div class="roster-toolbar" id="toolbar">
                         <span class="row-count" id="rowCount">0 employees</span>
                         <button type="button" class="btn btn-outline btn-sm" id="btnPending"><i class="fas fa-hourglass-half"></i> Pending Requests <span class="btn-badge" id="pendingCount">0</span></button>
-                        <button type="button" class="btn btn-outline btn-sm" id="btnAgents"><i class="fas fa-people-group"></i> Agents' Bonuses</button>
+                        <button type="button" class="btn btn-outline btn-sm" id="btnAgents"><i class="fas fa-people-group"></i> Agents' Incentives</button>
+                        <button type="button" class="btn btn-outline btn-sm" id="btnOvertime"><i class="fas fa-business-time"></i> Agents' Overtime</button>
                         <div class="cols-wrap" id="colsWrap">
                             <button type="button" class="btn btn-outline btn-sm" id="btnCols"><i class="fas fa-table-columns"></i> Show additional columns <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></button>
                             <div class="cols-panel">
@@ -543,42 +566,85 @@
             <div class="fullscreen-overlay" id="agentsModal"><div class="fullscreen-panel agents-modal">
                 <div class="fs-header">
                     <div class="fs-header-titles">
-                        <h2 class="fs-title">Agents' Bonuses</h2>
-                        <span class="fs-subtitle">Add monthly bonuses for your agents in bulk</span>
+                        <h2 class="fs-title">Agents' Incentives</h2>
+                        <span class="fs-subtitle">Add, review, and confirm your agents' monthly incentives</span>
                     </div>
-                    <button type="button" class="close-x" id="agentsClose" title="Discard &amp; exit"><i class="fas fa-times"></i></button>
+                    <div class="fs-header-actions">
+                        <button type="button" class="btn btn-outline" id="agentsSaveExit" disabled><i class="fas fa-floppy-disk"></i> Save &amp; Exit</button>
+                        <button type="button" class="btn btn-outline" id="agentsClose"><i class="fas fa-xmark"></i> Exit</button>
+                    </div>
                 </div>
                 <div class="fs-body">
                     <div class="roster-banner agents-banner">
                         <i class="fas fa-people-group banner-icon"></i>
                         <div class="banner-text">
-                            <div class="banner-title">Bulk bonus entry for agents</div>
+                            <div class="banner-title">Agents' monthly incentives</div>
                             <div class="banner-note">
-                                <div>Set a <strong>purpose</strong> and <strong>amount</strong> for each agent, or select several agents and apply the same purpose at once with <strong>Set Bonus Purpose</strong>.</div>
+                                <div>Set the <strong>incentive amount</strong> for each agent. Where an amount is already auto-calculated, you can review and edit it directly in this page.</div>
                                 <div>Amounts are rounded up to the nearest whole number. Nothing is sent until you choose <strong>Save &amp; Submit to Payroll</strong>.</div>
                             </div>
                         </div>
                     </div>
                     <div class="agents-toolbar">
-                        <button type="button" class="btn btn-outline btn-sm" id="btnSetPurpose" disabled><i class="fas fa-tags"></i> Set Bonus Purpose</button>
-                        <span class="agents-selcount" id="agentsSelCount"></span>
                         <span class="agents-status" id="agentsStatus"></span>
                     </div>
                     <div class="hist-table-wrap agents-wrap" id="agentsWrap">
                         <table class="hist-table agents-table" id="agentsTable">
-                            <colgroup><col style="width:4%"><col style="width:17%"><col style="width:12%"><col style="width:12%"><col style="width:11%"><col style="width:9%"><col style="width:9%"><col style="width:26%"></colgroup>
+                            <colgroup><col style="width:20%"><col style="width:14%"><col style="width:14%"><col style="width:13%"><col style="width:11%"><col style="width:12%"><col style="width:16%"></colgroup>
                             <thead><tr>
-                                <th><input type="checkbox" id="agentsSelAll" title="Select all"></th>
-                                <th>Office Staff Name</th><th>Manager</th><th>Department</th><th>Job Title</th><th>Employee Type</th><th>Salary</th><th>Bonus</th>
+                                <th>Office Staff Name</th><th>Manager</th><th>Department</th><th>Job Title</th><th>Employee Type</th><th>Salary</th><th>Incentive Amount</th>
                             </tr></thead>
                             <tbody id="agentsBody"></tbody>
                         </table>
                     </div>
                 </div>
                 <div class="fs-footer">
-                    <button type="button" class="btn btn-outline" id="agentsDiscard"><i class="fas fa-xmark"></i> Discard &amp; Exit</button>
+                    <button type="button" class="btn btn-outline" id="agentsDiscardChanges" disabled><i class="fas fa-rotate-left"></i> Discard</button>
                     <button type="button" class="btn btn-outline" id="agentsSave" disabled><i class="fas fa-floppy-disk"></i> Save without Submitting</button>
                     <button type="button" class="btn btn-primary" id="agentsSubmit"><i class="fas fa-paper-plane"></i> Save &amp; Submit to Payroll</button>
+                </div>
+            </div></div>
+
+            <!-- Agents' Overtime full-screen view -->
+            <div class="fullscreen-overlay" id="overtimeModal"><div class="fullscreen-panel agents-modal">
+                <div class="fs-header">
+                    <div class="fs-header-titles">
+                        <h2 class="fs-title">Agents' Overtime</h2>
+                        <span class="fs-subtitle">Enter overtime hours; the amount is calculated for you</span>
+                    </div>
+                    <div class="fs-header-actions">
+                        <button type="button" class="btn btn-outline" id="otSaveExit" disabled><i class="fas fa-floppy-disk"></i> Save &amp; Exit</button>
+                        <button type="button" class="btn btn-outline" id="otClose"><i class="fas fa-xmark"></i> Exit</button>
+                    </div>
+                </div>
+                <div class="fs-body">
+                    <div class="roster-banner agents-banner">
+                        <i class="fas fa-business-time banner-icon"></i>
+                        <div class="banner-text">
+                            <div class="banner-title">Agents' monthly overtime</div>
+                            <div class="banner-note">
+                                <div>Just enter the <strong>overtime hours</strong> worked by each agent. The overtime amount is auto-calculated as <strong>(Basic Salary &divide; 30.4 &divide; 9) &times; Overtime Hours &times; Multiplier</strong>.</div>
+                                <div>The <strong>multiplier</strong> defaults to <strong>1.25</strong> (the minimum). You can raise it per employee in the Multiplier column; it cannot go below 1.25. Amounts are rounded up to the nearest whole number. Nothing is sent until you choose <strong>Save &amp; Submit to Payroll</strong>.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="agents-toolbar">
+                        <span class="agents-status" id="otStatus"></span>
+                    </div>
+                    <div class="hist-table-wrap agents-wrap" id="otWrap">
+                        <table class="hist-table agents-table" id="otTable">
+                            <colgroup><col style="width:17%"><col style="width:12%"><col style="width:11%"><col style="width:11%"><col style="width:10%"><col style="width:11%"><col style="width:9%"><col style="width:11%"><col style="width:12%"></colgroup>
+                            <thead><tr>
+                                <th>Office Staff Name</th><th>Manager</th><th>Department</th><th>Job Title</th><th>Employee Type</th><th>Basic Salary</th><th>Overtime Hours</th><th>Multiplier</th><th>Overtime Amount</th>
+                            </tr></thead>
+                            <tbody id="otBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="fs-footer">
+                    <button type="button" class="btn btn-outline" id="otDiscardChanges" disabled><i class="fas fa-rotate-left"></i> Discard</button>
+                    <button type="button" class="btn btn-outline" id="otSave" disabled><i class="fas fa-floppy-disk"></i> Save without Submitting</button>
+                    <button type="button" class="btn btn-primary" id="otSubmit"><i class="fas fa-paper-plane"></i> Save &amp; Submit to Payroll</button>
                 </div>
             </div></div>
         </main>
@@ -726,17 +792,14 @@
         <div class="modal-footer"><button type="button" class="btn btn-outline" id="dupCancel">Cancel</button><button type="button" class="btn btn-primary" id="dupConfirm"><i class="fas fa-check"></i> Confirm</button></div>
     </div></div>
 
-    <!-- Set Bonus Purpose (bulk) Modal -->
-    <div class="modal-overlay" id="setPurposeModal"><div class="modal modal-confirm">
-        <div class="modal-header"><h3><i class="fas fa-tags" style="color:var(--primary-color);"></i> Set Bonus Purpose</h3><button type="button" class="close-x" id="setPurposeClose"><i class="fas fa-times"></i></button></div>
+    <!-- Discard Changes (stay on page) Confirm -->
+    <div class="modal-overlay" id="discardChangesModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Discard all unsaved changes?</h3><button type="button" class="close-x" id="discardChangesClose"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
-            <div class="modal-err" id="setPurposeErr"></div>
-            <p class="confirm-body" id="setPurposeIntro">Apply a bonus purpose to the selected agents.</p>
-            <div class="form-group"><label>Bonus Purpose <span class="req">*</span></label>
-                <select class="form-control" id="bulkPurpose"><option value="">-- Select purpose --</option><option>Bonus</option><option>Equipment</option><option>Salary Dispute</option><option>Transportation Fare Reimbursement</option><option>Retail Incentive</option><option>Low Exchange Rate Compensation</option><option>Prorated Salary</option><option>Cash Advance</option><option>Final Settlement</option></select>
-            </div>
+            <div class="danger-note"><i class="fas fa-triangle-exclamation"></i> This action is not reversible. All unsaved changes on this page will be cleared.</div>
+            <p class="confirm-body">You will stay on this page, but every amount you entered or edited since the last save will be reverted.</p>
         </div>
-        <div class="modal-footer"><button type="button" class="btn btn-outline" id="setPurposeCancel">Cancel</button><button type="button" class="btn btn-primary" id="setPurposeConfirm"><i class="fas fa-check"></i> Apply to selected</button></div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="discardChangesCancel">Keep editing</button><button type="button" class="btn btn-danger" id="discardChangesConfirm"><i class="fas fa-rotate-left"></i> Discard changes</button></div>
     </div></div>
 
     <!-- Agents Discard Confirm -->
@@ -749,8 +812,32 @@
     <!-- Agents Submit Confirm -->
     <div class="modal-overlay" id="agentsSubmitModal"><div class="modal modal-confirm">
         <div class="modal-header"><h3><i class="fas fa-paper-plane" style="color:var(--primary-color);"></i> Submit to payroll?</h3><button type="button" class="close-x" id="agentsSubmitClose"><i class="fas fa-times"></i></button></div>
-        <div class="modal-body"><p class="confirm-body">Are you sure you have applied all changes? Once you confirm, this page will no longer be available and the bonuses will be sent to the Office Staff Payroll module for approval.</p></div>
+        <div class="modal-body"><p class="confirm-body">Are you sure you have applied all changes? Once you confirm, this page will no longer be available and the incentives will be sent to the Office Staff Payroll module for approval.</p></div>
         <div class="modal-footer"><button type="button" class="btn btn-outline" id="agentsSubmitCancel">Cancel</button><button type="button" class="btn btn-primary" id="agentsSubmitConfirm"><i class="fas fa-check"></i> Confirm &amp; send</button></div>
+    </div></div>
+
+    <!-- Overtime Discard & Exit Confirm -->
+    <div class="modal-overlay" id="otDiscardModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-triangle-exclamation" style="color:#d97706;"></i> Discard unsaved changes?</h3><button type="button" class="close-x" id="otDiscardCloseX"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body"><p class="confirm-body">You have unsaved changes that will be lost. Are you sure you want to exit without saving?</p></div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="otDiscardCancel">Keep editing</button><button type="button" class="btn btn-danger" id="otDiscardConfirm"><i class="fas fa-xmark"></i> Discard &amp; exit</button></div>
+    </div></div>
+
+    <!-- Overtime Discard Changes (stay) Confirm -->
+    <div class="modal-overlay" id="otDiscardChangesModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-triangle-exclamation" style="color:#dc2626;"></i> Discard all unsaved changes?</h3><button type="button" class="close-x" id="otDiscardChangesClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <div class="danger-note"><i class="fas fa-triangle-exclamation"></i> This action is not reversible. All unsaved changes on this page will be cleared.</div>
+            <p class="confirm-body">You will stay on this page, but every overtime entry since the last save will be reverted.</p>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="otDiscardChangesCancel">Keep editing</button><button type="button" class="btn btn-danger" id="otDiscardChangesConfirm"><i class="fas fa-rotate-left"></i> Discard changes</button></div>
+    </div></div>
+
+    <!-- Overtime Submit Confirm -->
+    <div class="modal-overlay" id="otSubmitModal"><div class="modal modal-confirm">
+        <div class="modal-header"><h3><i class="fas fa-paper-plane" style="color:var(--primary-color);"></i> Submit to payroll?</h3><button type="button" class="close-x" id="otSubmitCloseX"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body"><p class="confirm-body">Are you sure you have applied all changes? Once you confirm, this page will no longer be available and the overtime amounts will be sent to the Office Staff Payroll module for approval.</p></div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="otSubmitCancel">Cancel</button><button type="button" class="btn btn-primary" id="otSubmitConfirm"><i class="fas fa-check"></i> Confirm &amp; send</button></div>
     </div></div>
 
     <!-- Pending Requests Modal -->
@@ -1069,8 +1156,7 @@
             var oldWrap=panel.querySelector('.roster-table-wrap');
             var prevLeft=oldWrap?oldWrap.scrollLeft:0;
             var rows=applyFilters(TABS[state.tab]).slice().sort(function(a,b){
-                var m=a.manager.localeCompare(b.manager);
-                return m!==0 ? m : a.name.localeCompare(b.name);
+                return a.name.localeCompare(b.name);
             });
             var rc=document.getElementById('rowCount');
             if(rc) rc.innerHTML='<strong>'+rows.length+'</strong> '+(rows.length===1?'employee':'employees');
@@ -1292,7 +1378,7 @@
         /* ---------------- Modals ---------------- */
         function openModal(id){ document.getElementById(id).classList.add('open'); }
         function closeModal(id){ document.getElementById(id).classList.remove('open'); }
-        document.addEventListener('click', function(e){ var c=e.target.closest('[data-close]'); if(c) closeModal(c.getAttribute('data-close')); });
+        document.addEventListener('click', function(e){ var c=e.target.closest('[data-close]'); if(c){ var mid=c.getAttribute('data-close'); closeModal(mid); if(mid==='historyModal') document.getElementById('historyModal').classList.remove('over-pending'); } });
         // Action modals do not close on backdrop click or Escape — only via Cancel or the "x"
         document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ hideMenu(); colsWrap.classList.remove('open'); closeAllSelects(); } });
 
@@ -1475,9 +1561,10 @@
 
         // Detect a duplicate change (same type + exact same amount) within the last 30 days
         var TYPE_LABEL_TO_HIST={ raise:'Salary Raise', bonus:'Bonus', deduction:'Deduction' };
-        function findDuplicate(row, type, amount){
+        function findDuplicate(row, type, amount, excludeSrc){
             var histType=TYPE_LABEL_TO_HIST[type];
             var matches=(row.changeHistory||[]).filter(function(c){
+                if(excludeSrc && c===excludeSrc) return false; // don't match the record being edited
                 return c.type===histType && c.amt===amount && within30(c.date);
             });
             if(!matches.length) return null;
@@ -1562,8 +1649,15 @@
         }
 
         // Duplicate-confirm modal buttons
-        document.getElementById('dupConfirm').addEventListener('click', function(){ closeModal('dupModal'); doSubmit(); });
-        function dupCancelFn(){ closeModal('dupModal'); pendingSubmit=null; } // keep the underlying action modal open to edit
+        var dupEditMode=false; // true when the duplicate check is running for an Edit->Update
+        document.getElementById('dupConfirm').addEventListener('click', function(){
+            var over=document.getElementById('dupModal').classList.contains('over-edit');
+            document.getElementById('dupModal').classList.remove('over-edit');
+            closeModal('dupModal');
+            if(dupEditMode){ dupEditMode=false; showUpdateConfirm(); }
+            else { doSubmit(); }
+        });
+        function dupCancelFn(){ closeModal('dupModal'); document.getElementById('dupModal').classList.remove('over-edit'); pendingSubmit=null; dupEditMode=false; } // keep the underlying modal open to edit
         document.getElementById('dupCancel').addEventListener('click', dupCancelFn);
         document.getElementById('dupClose').addEventListener('click', dupCancelFn);
 
@@ -1634,7 +1728,12 @@
         // Clicking an employee name opens their history
         document.addEventListener('click', function(e){
             var link=e.target.closest('.emp-name-link');
-            if(link){ e.preventDefault(); var row=ROWS_BY_ID[link.getAttribute('data-history-id')]; if(row) openHistory(row); }
+            if(link){ e.preventDefault(); var row=ROWS_BY_ID[link.getAttribute('data-history-id')]; if(row){
+                // If opened from within the Pending Requests pop-up, layer the history modal above it
+                var overPending=document.getElementById('pendingModal').classList.contains('open');
+                document.getElementById('historyModal').classList.toggle('over-pending', overPending);
+                openHistory(row);
+            } }
         });
 
         /* ---------------- Pending Requests tab ---------------- */
@@ -1791,6 +1890,22 @@
             if(v.amt<=0){ showErr(errId,'Please enter an amount greater than 0.'); return; }
             if(editCtx.prefix!=='raise' && !v.purpose){ showErr(errId,'Please select a purpose.'); return; }
             if(!v.reason){ showErr(errId,'Please enter a reason.'); return; }
+            // #9: run the same duplicate check as the add modals, excluding the record being edited
+            var pr=pendingById(editCtx.pid);
+            var row = pr ? ROWS_BY_ID[pr.empId] : modalRow;
+            var dup = row ? findDuplicate(row, editCtx.prefix, v.amt, pr && pr._src) : null;
+            if(dup){
+                var copy=dupCopy(editCtx.prefix, dup);
+                document.getElementById('dupTitle').textContent=copy.header;
+                document.getElementById('dupBody').innerHTML=copy.body;
+                dupEditMode=true;
+                document.getElementById('dupModal').classList.add('over-edit');
+                openModal('dupModal');
+                return;
+            }
+            showUpdateConfirm();
+        }
+        function showUpdateConfirm(){
             document.getElementById('updReason').value='';
             openModal('updModal');
         }
@@ -1812,47 +1927,40 @@
             toastHtml('success','The pending '+pr.type.toLowerCase()+' for <b>'+esc(pr.name)+'</b> has been updated'+(editReason?'':'')+'. Payroll will update the manager note and the final manager\'s pending approvals, and notify the payroll handler.');
         });
 
-        /* ---------------- Agents' Bonuses tab ---------------- */
-        var BONUS_PURPOSE_OPTS=['Bonus','Equipment','Salary Dispute','Transportation Fare Reimbursement','Retail Incentive','Low Exchange Rate Compensation','Prorated Salary','Cash Advance','Final Settlement'];
-        var agentsState={ rows:[], dirty:false, submitted:false };
+        /* ---------------- Agents' Incentives screen ---------------- */
+        var agentsState={ rows:[], saved:[], dirty:false, submitted:false };
         function isAgent(r){ return (r.titleMain||'').trim().toLowerCase()==='agent'; }
         function buildAgents(){
-            // Reuse the roster data; agents = job title exactly "Agent"
             agentsState.rows = ALL.filter(isAgent).map(function(r){
-                return { id:r._id, name:r.name, manager:r.manager, dept:(r.dept||[]).join(', '), title:r.titleMain, empType:r.empType, salary:r.salary, cur:r.cur, purpose:'', amount:'', selected:false };
-            }).sort(function(a,b){ return a.manager.localeCompare(b.manager) || a.name.localeCompare(b.name); });
+                return { id:r._id, name:r.name, manager:r.manager, dept:(r.dept||[]).join(', '), title:r.titleMain, empType:r.empType, salary:r.salary, cur:r.cur, amount:'' };
+            }).sort(function(a,b){ return a.name.localeCompare(b.name); });
+            agentsState.saved = agentsState.rows.map(function(a){ return a.amount; }); // last-saved snapshot
             agentsState.dirty=false; agentsState.submitted=false;
-        }
-        function purposeSelectHtml(a){
-            var opts='<option value="">-- Select --</option>'+BONUS_PURPOSE_OPTS.map(function(o){ return '<option'+(a.purpose===o?' selected':'')+'>'+o+'</option>'; }).join('');
-            return '<select class="cell-purpose" data-aid="'+a.id+'"'+(agentsState.submitted?' disabled':'')+'>'+opts+'</select>';
         }
         function renderAgents(){
             var tb=document.getElementById('agentsBody');
-            if(!agentsState.rows.length){ tb.innerHTML='<tr><td colspan="8"><div class="hist-empty">No agents found in your team.</div></td></tr>'; return; }
+            if(!agentsState.rows.length){ tb.innerHTML='<tr><td colspan="7"><div class="hist-empty">No agents found in your team.</div></td></tr>'; syncAgentsUI(); return; }
             tb.innerHTML=agentsState.rows.map(function(a){
-                return '<tr'+(a.selected?' class="row-selected"':'')+'>'
-                    +'<td><input type="checkbox" class="agent-sel" data-aid="'+a.id+'"'+(a.selected?' checked':'')+(agentsState.submitted?' disabled':'')+'></td>'
+                return '<tr>'
                     +'<td><a href="#" class="emp-name-link" data-history-id="'+a.id+'">'+esc(a.name)+'</a></td>'
                     +'<td>'+esc(a.manager)+'</td>'
                     +'<td>'+esc(a.dept)+'</td>'
                     +'<td>'+esc(a.title)+'</td>'
                     +'<td>'+typeBadge(a.empType)+'</td>'
                     +'<td class="num mask-amt">'+fmt(a.salary,a.cur)+'</td>'
-                    +'<td><div class="bonus-cell">'+purposeSelectHtml(a)+'<span class="amt-wrap"><span class="cur-mini">'+esc(a.cur)+'</span><input type="number" min="0" step="1" class="cell-amt mask-amt" data-aid="'+a.id+'" value="'+(a.amount!==''?a.amount:'')+'" placeholder="0"'+(agentsState.submitted?' disabled':'')+'></span></div></td>'
+                    +'<td><div class="edit-field field-amt"><span class="edit-prefix">'+esc(a.cur)+'</span><input type="number" min="0" step="1" class="cell-amt mask-amt" data-aid="'+a.id+'" value="'+(a.amount!==''?a.amount:'')+'" placeholder="0"'+(agentsState.submitted?' disabled':'')+'></div></td>'
                     +'</tr>';
             }).join('');
             syncAgentsUI();
         }
         function agentById(id){ return agentsState.rows.filter(function(a){ return a.id===id; })[0]; }
-        function selectedAgents(){ return agentsState.rows.filter(function(a){ return a.selected; }); }
         function syncAgentsUI(){
-            var sel=selectedAgents().length, total=agentsState.rows.length;
-            document.getElementById('btnSetPurpose').disabled = sel===0 || agentsState.submitted;
-            document.getElementById('agentsSelCount').textContent = sel? (sel+' selected') : '';
-            var all=document.getElementById('agentsSelAll'); if(all){ all.checked = total>0 && sel===total; all.disabled=agentsState.submitted; }
-            document.getElementById('agentsSave').disabled = !agentsState.dirty || agentsState.submitted;
+            var dirty = agentsState.dirty && !agentsState.submitted;
+            document.getElementById('agentsSave').disabled = !dirty;
+            document.getElementById('agentsDiscardChanges').disabled = !dirty;
+            document.getElementById('agentsSaveExit').disabled = !dirty;
             document.getElementById('agentsSubmit').disabled = agentsState.submitted;
+            document.getElementById('agentsClose').innerHTML = dirty ? '<i class="fas fa-xmark"></i> Discard &amp; Exit' : '<i class="fas fa-arrow-right-from-bracket"></i> Exit';
             var st=document.getElementById('agentsStatus');
             if(agentsState.submitted){ st.textContent='Submitted to payroll'; st.className='agents-status submitted'; }
             else if(!agentsState.dirty){ st.textContent=''; st.className='agents-status'; }
@@ -1860,64 +1968,56 @@
         }
         function openAgents(){ buildAgents(); renderAgents(); openModal('agentsModal'); }
 
-        // Editable cells (delegated)
+        // Editable amount cells (delegated)
         document.getElementById('agentsBody').addEventListener('input', function(e){
             var amt=e.target.closest('.cell-amt');
             if(amt){ var a=agentById(parseInt(amt.getAttribute('data-aid'),10)); if(a){ a.amount=amt.value; agentsState.dirty=true; syncAgentsUI(); } }
         });
         document.getElementById('agentsBody').addEventListener('change', function(e){
             var amt=e.target.closest('.cell-amt');
-            if(amt){ var a=agentById(parseInt(amt.getAttribute('data-aid'),10)); if(a){ var v=parseFloat(amt.value); if(!isNaN(v)&&v>0){ a.amount=Math.ceil(v); amt.value=a.amount; } else if(amt.value===''){ a.amount=''; } agentsState.dirty=true; syncAgentsUI(); } return; }
-            var pur=e.target.closest('.cell-purpose');
-            if(pur){ var a2=agentById(parseInt(pur.getAttribute('data-aid'),10)); if(a2){ a2.purpose=pur.value; agentsState.dirty=true; syncAgentsUI(); } return; }
-            var sel=e.target.closest('.agent-sel');
-            if(sel){ var a3=agentById(parseInt(sel.getAttribute('data-aid'),10)); if(a3){ a3.selected=sel.checked; syncAgentsUI(); } return; }
-        });
-        // Select all
-        document.getElementById('agentsSelAll').addEventListener('change', function(){
-            var check = !(selectedAgents().length===agentsState.rows.length); // if not all selected -> select all; else clear
-            agentsState.rows.forEach(function(a){ a.selected=check; });
-            renderAgents();
+            if(amt){ var a=agentById(parseInt(amt.getAttribute('data-aid'),10)); if(a){ var v=parseFloat(amt.value); if(!isNaN(v)&&v>0){ a.amount=Math.ceil(v); amt.value=a.amount; } else if(amt.value===''){ a.amount=''; } agentsState.dirty=true; syncAgentsUI(); } }
         });
 
-        /* ----- Set Bonus Purpose (bulk) ----- */
-        document.getElementById('btnSetPurpose').addEventListener('click', function(){
-            if(this.disabled) return;
-            document.getElementById('setPurposeIntro').textContent='Apply a bonus purpose to the '+selectedAgents().length+' selected agent(s).';
-            document.getElementById('bulkPurpose').value='';
-            document.getElementById('setPurposeErr').classList.remove('show');
-            openModal('setPurposeModal');
-        });
-        function closeSetPurpose(){ closeModal('setPurposeModal'); }
-        document.getElementById('setPurposeCancel').addEventListener('click', closeSetPurpose);
-        document.getElementById('setPurposeClose').addEventListener('click', closeSetPurpose);
-        document.getElementById('setPurposeConfirm').addEventListener('click', function(){
-            var v=document.getElementById('bulkPurpose').value;
-            if(!v){ showErr('setPurposeErr','Please select a bonus purpose.'); return; }
-            selectedAgents().forEach(function(a){ a.purpose=v; });
-            agentsState.dirty=true;
-            closeModal('setPurposeModal');
-            renderAgents();
-        });
-
-        /* ----- Discard / Save / Submit ----- */
+        /* ----- Discard & Exit / Save / Discard changes / Submit ----- */
         function leaveAgents(){ closeModal('agentsModal'); }
-        document.getElementById('agentsClose').addEventListener('click', function(){ attemptDiscard(); });
-        document.getElementById('agentsDiscard').addEventListener('click', function(){ attemptDiscard(); });
-        function attemptDiscard(){
+        function attemptDiscardExit(){
             if(agentsState.dirty && !agentsState.submitted){ openModal('agentsDiscardModal'); }
             else { leaveAgents(); }
         }
+        document.getElementById('agentsClose').addEventListener('click', attemptDiscardExit);
         document.getElementById('agentsDiscardCancel').addEventListener('click', function(){ closeModal('agentsDiscardModal'); });
         document.getElementById('agentsDiscardClose').addEventListener('click', function(){ closeModal('agentsDiscardModal'); });
         document.getElementById('agentsDiscardConfirm').addEventListener('click', function(){ closeModal('agentsDiscardModal'); leaveAgents(); });
 
-        document.getElementById('agentsSave').addEventListener('click', function(){
-            if(this.disabled) return;
+        // Save without submitting
+        function saveAgents(silent){
+            agentsState.saved = agentsState.rows.map(function(a){ return a.amount; });
             agentsState.dirty=false; syncAgentsUI();
-            toastHtml('success','Your agent bonus changes have been saved. You can keep editing or submit them to payroll when ready.');
+            if(!silent) toastHtml('success','Your agent incentive amounts have been saved. You can keep editing or submit them to payroll when ready.');
+        }
+        document.getElementById('agentsSave').addEventListener('click', function(){ if(this.disabled) return; saveAgents(false); });
+        document.getElementById('agentsSaveExit').addEventListener('click', function(){
+            if(this.disabled) return;
+            saveAgents(true); leaveAgents();
+            toastHtml('success','Your agent incentive amounts have been saved.');
         });
 
+        // Discard changes (revert to last saved, stay on page)
+        document.getElementById('agentsDiscardChanges').addEventListener('click', function(){
+            if(this.disabled) return;
+            openModal('discardChangesModal');
+        });
+        document.getElementById('discardChangesCancel').addEventListener('click', function(){ closeModal('discardChangesModal'); });
+        document.getElementById('discardChangesClose').addEventListener('click', function(){ closeModal('discardChangesModal'); });
+        document.getElementById('discardChangesConfirm').addEventListener('click', function(){
+            agentsState.rows.forEach(function(a,idx){ a.amount = agentsState.saved[idx]!==undefined ? agentsState.saved[idx] : ''; });
+            agentsState.dirty=false;
+            closeModal('discardChangesModal');
+            renderAgents();
+            toastHtml('neutral','Unsaved changes were discarded.');
+        });
+
+        // Submit
         document.getElementById('agentsSubmit').addEventListener('click', function(){
             if(this.disabled) return;
             openModal('agentsSubmitModal');
@@ -1925,18 +2025,127 @@
         document.getElementById('agentsSubmitCancel').addEventListener('click', function(){ closeModal('agentsSubmitModal'); });
         document.getElementById('agentsSubmitClose').addEventListener('click', function(){ closeModal('agentsSubmitModal'); });
         document.getElementById('agentsSubmitConfirm').addEventListener('click', function(){
-            var withBonus=agentsState.rows.filter(function(a){ return a.amount!=='' && Number(a.amount)>0 && a.purpose; });
+            var withAmt=agentsState.rows.filter(function(a){ return a.amount!=='' && Number(a.amount)>0; });
             agentsState.submitted=true; agentsState.dirty=false;
             closeModal('agentsSubmitModal');
             renderAgents();
-            // In production the tab would disappear; for the demo we return to the main table.
             closeModal('agentsModal');
-            toastHtml('success', withBonus.length+' agent bonus(es) have been sent to the Office Staff Payroll module for approval. In production, the Agents\' Bonuses page would now be unavailable until the next cycle.');
+            toastHtml('success', withAmt.length+' agent incentive(s) have been sent to the Office Staff Payroll module for approval. In production, the Agents\' Incentives page would now be unavailable until the next cycle.');
         });
 
-        // Tab buttons that open overlays (Pending Requests / Agents' Bonuses)
+        /* ---------------- Agents' Overtime screen ---------------- */
+        var otState={ rows:[], saved:[], dirty:false, submitted:false };
+        var OT_MIN_MULT=1.25;
+        function otAmount(basic, hours, mult){
+            var h=parseFloat(hours)||0; if(h<=0) return 0;
+            var m=parseFloat(mult); if(isNaN(m)||m<OT_MIN_MULT) m=OT_MIN_MULT;
+            return Math.ceil((basic/30.4/9)*h*m);
+        }
+        function buildOvertime(){
+            otState.rows = ALL.filter(isAgent).map(function(r){
+                return { id:r._id, name:r.name, manager:r.manager, dept:(r.dept||[]).join(', '), title:r.titleMain, empType:r.empType, salary:r.salary, cur:r.cur, hours:'', mult:OT_MIN_MULT };
+            }).sort(function(a,b){ return a.name.localeCompare(b.name); });
+            otState.saved = otState.rows.map(function(a){ return { hours:a.hours, mult:a.mult }; });
+            otState.dirty=false; otState.submitted=false;
+        }
+        function otAmtCellHtml(a){
+            var amt=otAmount(a.salary,a.hours,a.mult);
+            if(a.hours!=='' && amt>0){ return '<span class="ot-amt-val">'+fmt(amt,a.cur)+'</span>'; }
+            return '<span class="ot-amt-empty">&mdash;</span>';
+        }
+        function renderOvertime(){
+            var tb=document.getElementById('otBody');
+            if(!otState.rows.length){ tb.innerHTML='<tr><td colspan="9"><div class="hist-empty">No agents found in your team.</div></td></tr>'; syncOtUI(); return; }
+            tb.innerHTML=otState.rows.map(function(a){
+                return '<tr>'
+                    +'<td><a href="#" class="emp-name-link" data-history-id="'+a.id+'">'+esc(a.name)+'</a></td>'
+                    +'<td>'+esc(a.manager)+'</td>'
+                    +'<td>'+esc(a.dept)+'</td>'
+                    +'<td>'+esc(a.title)+'</td>'
+                    +'<td>'+typeBadge(a.empType)+'</td>'
+                    +'<td class="num mask-amt">'+fmt(a.salary,a.cur)+'</td>'
+                    +'<td><div class="edit-field field-hours"><input type="number" min="0" step="0.5" class="cell-hours" data-aid="'+a.id+'" value="'+(a.hours!==''?a.hours:'')+'" placeholder="0"'+(otState.submitted?' disabled':'')+'><span class="edit-unit">h</span></div></td>'
+                    +'<td><div class="edit-field field-mult"><span class="edit-prefix">&times;</span><input type="number" min="1.25" step="0.05" class="cell-mult" data-aid="'+a.id+'" value="'+a.mult+'"'+(otState.submitted?' disabled':'')+'></div></td>'
+                    +'<td class="ot-amt-cell mask-amt">'+otAmtCellHtml(a)+'</td>'
+                    +'</tr>';
+            }).join('');
+            syncOtUI();
+        }
+        function otById(id){ return otState.rows.filter(function(a){ return a.id===id; })[0]; }
+        function syncOtUI(){
+            var dirty = otState.dirty && !otState.submitted;
+            document.getElementById('otSave').disabled = !dirty;
+            document.getElementById('otDiscardChanges').disabled = !dirty;
+            document.getElementById('otSaveExit').disabled = !dirty;
+            document.getElementById('otSubmit').disabled = otState.submitted;
+            document.getElementById('otClose').innerHTML = dirty ? '<i class="fas fa-xmark"></i> Discard &amp; Exit' : '<i class="fas fa-arrow-right-from-bracket"></i> Exit';
+            var st=document.getElementById('otStatus');
+            if(otState.submitted){ st.textContent='Submitted to payroll'; st.className='agents-status submitted'; }
+            else if(!otState.dirty){ st.textContent=''; st.className='agents-status'; }
+            else { st.textContent='Unsaved changes'; st.className='agents-status'; }
+        }
+        function openOvertime(){ buildOvertime(); renderOvertime(); openModal('overtimeModal'); }
+
+        function otRecalcRow(inputEl, a){
+            var cell=inputEl.closest('tr').querySelector('.ot-amt-cell');
+            if(cell) cell.innerHTML=otAmtCellHtml(a);
+        }
+        // Live edit of hours and multiplier
+        document.getElementById('otBody').addEventListener('input', function(e){
+            var hrs=e.target.closest('.cell-hours');
+            if(hrs){ var a=otById(parseInt(hrs.getAttribute('data-aid'),10)); if(a){ a.hours=hrs.value; otState.dirty=true; otRecalcRow(hrs,a); syncOtUI(); } return; }
+            var mul=e.target.closest('.cell-mult');
+            if(mul){ var a2=otById(parseInt(mul.getAttribute('data-aid'),10)); if(a2){ a2.mult=mul.value; otState.dirty=true; otRecalcRow(mul,a2); syncOtUI(); } return; }
+        });
+        // On blur/commit: normalise values (hours empty allowed; multiplier clamped to >= 1.25)
+        document.getElementById('otBody').addEventListener('change', function(e){
+            var hrs=e.target.closest('.cell-hours');
+            if(hrs){ var a=otById(parseInt(hrs.getAttribute('data-aid'),10)); if(a){ if(hrs.value===''){ a.hours=''; } otState.dirty=true; otRecalcRow(hrs,a); syncOtUI(); } return; }
+            var mul=e.target.closest('.cell-mult');
+            if(mul){ var a2=otById(parseInt(mul.getAttribute('data-aid'),10)); if(a2){ var m=parseFloat(mul.value); if(isNaN(m)||m<OT_MIN_MULT){ m=OT_MIN_MULT; } a2.mult=m; mul.value=m; otState.dirty=true; otRecalcRow(mul,a2); syncOtUI(); } return; }
+        });
+
+        /* Discard & Exit / Save / Discard changes / Submit */
+        function leaveOvertime(){ closeModal('overtimeModal'); }
+        function attemptOtDiscardExit(){ if(otState.dirty && !otState.submitted){ openModal('otDiscardModal'); } else { leaveOvertime(); } }
+        document.getElementById('otClose').addEventListener('click', attemptOtDiscardExit);
+        document.getElementById('otDiscardCancel').addEventListener('click', function(){ closeModal('otDiscardModal'); });
+        document.getElementById('otDiscardCloseX').addEventListener('click', function(){ closeModal('otDiscardModal'); });
+        document.getElementById('otDiscardConfirm').addEventListener('click', function(){ closeModal('otDiscardModal'); leaveOvertime(); });
+
+        function saveOvertime(silent){
+            otState.saved = otState.rows.map(function(a){ return { hours:a.hours, mult:a.mult }; });
+            otState.dirty=false; syncOtUI();
+            if(!silent) toastHtml('success','Your agent overtime hours have been saved. You can keep editing or submit them to payroll when ready.');
+        }
+        document.getElementById('otSave').addEventListener('click', function(){ if(this.disabled) return; saveOvertime(false); });
+        document.getElementById('otSaveExit').addEventListener('click', function(){
+            if(this.disabled) return;
+            saveOvertime(true); leaveOvertime();
+            toastHtml('success','Your agent overtime hours have been saved.');
+        });
+        document.getElementById('otDiscardChanges').addEventListener('click', function(){ if(this.disabled) return; openModal('otDiscardChangesModal'); });
+        document.getElementById('otDiscardChangesCancel').addEventListener('click', function(){ closeModal('otDiscardChangesModal'); });
+        document.getElementById('otDiscardChangesClose').addEventListener('click', function(){ closeModal('otDiscardChangesModal'); });
+        document.getElementById('otDiscardChangesConfirm').addEventListener('click', function(){
+            otState.rows.forEach(function(a,idx){ var sv=otState.saved[idx]||{hours:'',mult:OT_MIN_MULT}; a.hours=sv.hours; a.mult=sv.mult; });
+            otState.dirty=false; closeModal('otDiscardChangesModal'); renderOvertime();
+            toastHtml('neutral','Unsaved changes were discarded.');
+        });
+        document.getElementById('otSubmit').addEventListener('click', function(){ if(this.disabled) return; openModal('otSubmitModal'); });
+        document.getElementById('otSubmitCancel').addEventListener('click', function(){ closeModal('otSubmitModal'); });
+        document.getElementById('otSubmitCloseX').addEventListener('click', function(){ closeModal('otSubmitModal'); });
+        document.getElementById('otSubmitConfirm').addEventListener('click', function(){
+            var withHrs=otState.rows.filter(function(a){ return a.hours!=='' && Number(a.hours)>0; });
+            otState.submitted=true; otState.dirty=false;
+            closeModal('otSubmitModal'); renderOvertime(); closeModal('overtimeModal');
+            toastHtml('success', withHrs.length+' agent overtime record(s) have been sent to the Office Staff Payroll module for approval. In production, the Agents\' Overtime page would now be unavailable until the next cycle.');
+        });
+
+        // Buttons that open overlays
         document.getElementById('btnPending').addEventListener('click', function(){ openPending(); });
         document.getElementById('btnAgents').addEventListener('click', function(){ openAgents(); });
+        document.getElementById('btnOvertime').addEventListener('click', function(){ openOvertime(); });
 
         /* ---------------- Init ---------------- */
         document.getElementById('raiseAmountLabel').setAttribute('data-base','Salary Raise Amount');
@@ -1947,6 +2156,7 @@
         document.getElementById('addAmount').addEventListener('change', function(){ onAmountChange('add'); });
         document.getElementById('dedAmount').addEventListener('change', function(){ onAmountChange('ded'); });
         buildAddlFilters(); buildColOptions(); refreshTabCounts(); refreshSelects(); renderTable();
+        buildPending(); document.getElementById('pendingCount').textContent=PENDING.length;
         requestAnimationFrame(layout);
     })();
     </script>
