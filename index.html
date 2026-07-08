@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://my.maidstech.ai/assets/css/style.css">
     <link rel="stylesheet" href="https://my.maidstech.ai/assets/css/pages.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
     :root {
         --primary-color: #6366f1; --primary-hover: #4f46e5;
@@ -403,6 +404,30 @@
     #updModal { z-index: 10015 !important; }
     #dupModal.over-edit { z-index: 10020 !important; }
     #historyModal.over-pending { z-index: 10010 !important; }
+    /* Upload Excel modal */
+    .modal.modal-upload { max-width: 620px; }
+    .up-section { background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: 0.6rem; padding: 0.85rem 1rem; margin: 0.85rem 0; }
+    .up-section-title { font-size: 0.82rem; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 0.45rem; margin-bottom: 0.5rem; }
+    .up-section-title i { color: var(--primary-color); }
+    .up-list { margin: 0; padding-left: 1.1rem; display: flex; flex-direction: column; gap: 0.35rem; }
+    .up-list li { font-size: 0.78rem; color: var(--text-secondary); line-height: 1.5; }
+    .up-list strong { color: var(--text-primary); }
+    .up-list em { font-style: normal; background: rgba(99,102,241,0.1); color: var(--primary-hover); padding: 0.05rem 0.35rem; border-radius: 0.3rem; font-weight: 600; }
+    .up-note { display: flex; gap: 0.5rem; align-items: flex-start; background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; font-size: 0.78rem; line-height: 1.5; border-radius: 0.5rem; padding: 0.6rem 0.75rem; margin-bottom: 0.85rem; }
+    .up-note i { margin-top: 0.15rem; }
+    .up-drop { border: 2px dashed var(--border-color); border-radius: 0.7rem; padding: 1.5rem 1rem; text-align: center; transition: border-color 0.15s, background 0.15s; cursor: pointer; }
+    .up-drop:hover, .up-drop.drag { border-color: var(--primary-color); background: rgba(99,102,241,0.04); }
+    .up-drop-icon { font-size: 1.6rem; color: var(--primary-color); margin-bottom: 0.5rem; }
+    .up-drop-text { font-size: 0.85rem; color: var(--text-secondary); }
+    .up-browse { background: none; border: none; color: var(--primary-color); font-weight: 700; cursor: pointer; font-family: inherit; font-size: 0.85rem; text-decoration: underline; padding: 0; }
+    .up-drop-hint { font-size: 0.72rem; color: var(--text-muted); margin-top: 0.35rem; }
+    .up-result { margin-top: 0.85rem; font-size: 0.82rem; line-height: 1.55; display: none; }
+    .up-result.show { display: block; }
+    .up-result.ok { color: #065f46; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 0.5rem; padding: 0.7rem 0.85rem; }
+    .up-result.err { color: #991b1b; background: #fef2f2; border: 1px solid #fecaca; border-radius: 0.5rem; padding: 0.7rem 0.85rem; }
+    .up-result .up-file { font-weight: 700; }
+    .up-result ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
+    .up-result li { margin-bottom: 0.15rem; }
     </style>
 </head>
 <body>
@@ -570,6 +595,7 @@
                         <span class="fs-subtitle">Add, review, and confirm your agents' monthly incentives</span>
                     </div>
                     <div class="fs-header-actions">
+                        <button type="button" class="btn btn-outline" id="agentsUpload"><i class="fas fa-file-excel"></i> Upload Excel File</button>
                         <button type="button" class="btn btn-outline" id="agentsSaveExit" disabled><i class="fas fa-floppy-disk"></i> Save &amp; Exit</button>
                         <button type="button" class="btn btn-outline" id="agentsClose"><i class="fas fa-xmark"></i> Exit</button>
                     </div>
@@ -613,6 +639,7 @@
                         <span class="fs-subtitle">Enter overtime hours; the amount is calculated for you</span>
                     </div>
                     <div class="fs-header-actions">
+                        <button type="button" class="btn btn-outline" id="otUpload"><i class="fas fa-file-excel"></i> Upload Excel File</button>
                         <button type="button" class="btn btn-outline" id="otSaveExit" disabled><i class="fas fa-floppy-disk"></i> Save &amp; Exit</button>
                         <button type="button" class="btn btn-outline" id="otClose"><i class="fas fa-xmark"></i> Exit</button>
                     </div>
@@ -812,7 +839,7 @@
     <!-- Agents Submit Confirm -->
     <div class="modal-overlay" id="agentsSubmitModal"><div class="modal modal-confirm">
         <div class="modal-header"><h3><i class="fas fa-paper-plane" style="color:var(--primary-color);"></i> Submit to payroll?</h3><button type="button" class="close-x" id="agentsSubmitClose"><i class="fas fa-times"></i></button></div>
-        <div class="modal-body"><p class="confirm-body">Are you sure you have applied all changes? Once you confirm, this page will no longer be available and the incentives will be sent to the Office Staff Payroll module for approval.</p></div>
+        <div class="modal-body"><p class="confirm-body" id="agentsSubmitSummary"></p><p class="confirm-body">Once you confirm, this page will no longer be available and the incentives will be sent to the Office Staff Payroll module for approval.</p></div>
         <div class="modal-footer"><button type="button" class="btn btn-outline" id="agentsSubmitCancel">Cancel</button><button type="button" class="btn btn-primary" id="agentsSubmitConfirm"><i class="fas fa-check"></i> Confirm &amp; send</button></div>
     </div></div>
 
@@ -836,8 +863,60 @@
     <!-- Overtime Submit Confirm -->
     <div class="modal-overlay" id="otSubmitModal"><div class="modal modal-confirm">
         <div class="modal-header"><h3><i class="fas fa-paper-plane" style="color:var(--primary-color);"></i> Submit to payroll?</h3><button type="button" class="close-x" id="otSubmitCloseX"><i class="fas fa-times"></i></button></div>
-        <div class="modal-body"><p class="confirm-body">Are you sure you have applied all changes? Once you confirm, this page will no longer be available and the overtime amounts will be sent to the Office Staff Payroll module for approval.</p></div>
+        <div class="modal-body"><p class="confirm-body" id="otSubmitSummary"></p><p class="confirm-body">Once you confirm, this page will no longer be available and the overtime amounts will be sent to the Office Staff Payroll module for approval.</p></div>
         <div class="modal-footer"><button type="button" class="btn btn-outline" id="otSubmitCancel">Cancel</button><button type="button" class="btn btn-primary" id="otSubmitConfirm"><i class="fas fa-check"></i> Confirm &amp; send</button></div>
+    </div></div>
+
+    <!-- Upload Excel — Agents' Incentives -->
+    <div class="modal-overlay" id="agentsUploadModal"><div class="modal modal-upload">
+        <div class="modal-header"><h3><i class="fas fa-file-excel" style="color:#16a34a;"></i> Upload incentives from Excel</h3><button type="button" class="close-x" id="agentsUploadClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <p class="modal-intro">Upload an Excel file with your agent IDs and each agent's incentive amount. The system will automatically fill in the Incentive Amount column for the matching agents.</p>
+            <div class="up-section">
+                <div class="up-section-title"><i class="fas fa-table-list"></i> File format &amp; instructions</div>
+                <ul class="up-list">
+                    <li><strong>Row 1</strong> is the header row (e.g. <em>ID</em>, <em>Incentive</em>). The system starts reading from <strong>row 2</strong>.</li>
+                    <li><strong>Column A</strong> = Agent ID, <strong>Column B</strong> = Incentive amount. Both must be numeric. Any column from <strong>C</strong> onward is ignored.</li>
+                    <li>No empty rows in between — reading starts at row 2 and <strong>stops at the first empty row</strong>.</li>
+                    <li>The <strong>ID is mandatory</strong>; the incentive is optional. If an ID is present but its incentive is empty, that agent's incentive is set to <strong>0</strong> (overriding any current value).</li>
+                </ul>
+            </div>
+            <div class="up-note"><i class="fas fa-circle-info"></i> <span>Once you confirm, the incentive amount of every agent whose ID is in the sheet will be overridden with the sheet's value.</span></div>
+            <div class="up-drop" id="agentsDrop">
+                <input type="file" id="agentsFile" accept=".xlsx,.xls" hidden>
+                <i class="fas fa-cloud-arrow-up up-drop-icon"></i>
+                <div class="up-drop-text"><button type="button" class="up-browse" id="agentsBrowse">Choose a file</button> or drag it here</div>
+                <div class="up-drop-hint">.xlsx or .xls</div>
+            </div>
+            <div class="up-result" id="agentsUploadResult"></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="agentsUploadCancel">Cancel</button><button type="button" class="btn btn-primary" id="agentsUploadConfirm" disabled><i class="fas fa-check"></i> Confirm &amp; fill in</button></div>
+    </div></div>
+
+    <!-- Upload Excel — Agents' Overtime -->
+    <div class="modal-overlay" id="otUploadModal"><div class="modal modal-upload">
+        <div class="modal-header"><h3><i class="fas fa-file-excel" style="color:#16a34a;"></i> Upload overtime from Excel</h3><button type="button" class="close-x" id="otUploadClose"><i class="fas fa-times"></i></button></div>
+        <div class="modal-body">
+            <p class="modal-intro">Upload an Excel file with your agent IDs, overtime hours, and multiplier. The system will automatically fill in the Overtime Hours and Multiplier columns for the matching agents.</p>
+            <div class="up-section">
+                <div class="up-section-title"><i class="fas fa-table-list"></i> File format &amp; instructions</div>
+                <ul class="up-list">
+                    <li><strong>Row 1</strong> is the header row (e.g. <em>ID</em>, <em>Overtime Hours</em>, <em>Multiplier</em>). The system starts reading from <strong>row 2</strong>.</li>
+                    <li><strong>Column A</strong> = Agent ID, <strong>Column B</strong> = Overtime hours, <strong>Column C</strong> = Multiplier. All must be numeric. Any column from <strong>D</strong> onward is ignored.</li>
+                    <li>No empty rows in between — reading starts at row 2 and <strong>stops at the first empty row</strong>.</li>
+                    <li>The <strong>ID is mandatory</strong>. If <strong>overtime hours</strong> is empty it is counted as <strong>0</strong>; if <strong>multiplier</strong> is empty it defaults to <strong>1.25</strong> (values below 1.25 are raised to 1.25).</li>
+                </ul>
+            </div>
+            <div class="up-note"><i class="fas fa-circle-info"></i> <span>Once you confirm, the overtime hours and multiplier of every agent whose ID is in the sheet will be overridden with the sheet's values.</span></div>
+            <div class="up-drop" id="otDrop">
+                <input type="file" id="otFile" accept=".xlsx,.xls" hidden>
+                <i class="fas fa-cloud-arrow-up up-drop-icon"></i>
+                <div class="up-drop-text"><button type="button" class="up-browse" id="otBrowse">Choose a file</button> or drag it here</div>
+                <div class="up-drop-hint">.xlsx or .xls</div>
+            </div>
+            <div class="up-result" id="otUploadResult"></div>
+        </div>
+        <div class="modal-footer"><button type="button" class="btn btn-outline" id="otUploadCancel">Cancel</button><button type="button" class="btn btn-primary" id="otUploadConfirm" disabled><i class="fas fa-check"></i> Confirm &amp; fill in</button></div>
     </div></div>
 
     <!-- Pending Requests Modal -->
@@ -1930,10 +2009,34 @@
         /* ---------------- Agents' Incentives screen ---------------- */
         var agentsState={ rows:[], saved:[], dirty:false, submitted:false };
         function isAgent(r){ return (r.titleMain||'').trim().toLowerCase()==='agent'; }
+        // #3: positive amounts first, zeros/blank last; each group sorted A-Z by name
+        function sortByAmountThenName(rows, valFn){
+            return rows.slice().sort(function(a,b){
+                var pa = valFn(a) > 0 ? 0 : 1, pb = valFn(b) > 0 ? 0 : 1;
+                if(pa!==pb) return pa-pb;
+                return a.name.localeCompare(b.name);
+            });
+        }
+        // Sum amounts per currency -> returns {AED:1200, USD:300, ...}
+        function sumByCurrency(rows, valFn){
+            var totals={};
+            rows.forEach(function(r){ var v=valFn(r); if(v>0){ totals[r.cur]=(totals[r.cur]||0)+v; } });
+            return totals;
+        }
+        // Format {AED:1200, USD:300} -> "AED 1,200 and USD 300"; empty -> "0"
+        function currencyTotalsText(totals){
+            var parts=[]; var order=['AED','USD']; var keys=Object.keys(totals);
+            keys.sort(function(a,b){ var ia=order.indexOf(a), ib=order.indexOf(b); if(ia===-1)ia=99; if(ib===-1)ib=99; return ia-ib || a.localeCompare(b); });
+            keys.forEach(function(c){ parts.push(fmt(totals[c],c)); });
+            if(!parts.length) return fmt(0,'AED');
+            if(parts.length===1) return parts[0];
+            return parts.slice(0,-1).join(', ')+' and '+parts[parts.length-1];
+        }
         function buildAgents(){
             agentsState.rows = ALL.filter(isAgent).map(function(r){
                 return { id:r._id, name:r.name, manager:r.manager, dept:(r.dept||[]).join(', '), title:r.titleMain, empType:r.empType, salary:r.salary, cur:r.cur, amount:'' };
-            }).sort(function(a,b){ return a.name.localeCompare(b.name); });
+            });
+            agentsState.rows = sortByAmountThenName(agentsState.rows, function(a){ return Number(a.amount)||0; });
             agentsState.saved = agentsState.rows.map(function(a){ return a.amount; }); // last-saved snapshot
             agentsState.dirty=false; agentsState.submitted=false;
         }
@@ -1991,8 +2094,9 @@
 
         // Save without submitting
         function saveAgents(silent){
+            agentsState.rows = sortByAmountThenName(agentsState.rows, function(a){ return Number(a.amount)||0; });
             agentsState.saved = agentsState.rows.map(function(a){ return a.amount; });
-            agentsState.dirty=false; syncAgentsUI();
+            agentsState.dirty=false; renderAgents();
             if(!silent) toastHtml('success','Your agent incentive amounts have been saved. You can keep editing or submit them to payroll when ready.');
         }
         document.getElementById('agentsSave').addEventListener('click', function(){ if(this.disabled) return; saveAgents(false); });
@@ -2020,6 +2124,9 @@
         // Submit
         document.getElementById('agentsSubmit').addEventListener('click', function(){
             if(this.disabled) return;
+            var withAmt=agentsState.rows.filter(function(a){ return Number(a.amount)>0; });
+            var totals=sumByCurrency(agentsState.rows, function(a){ return Number(a.amount)||0; });
+            document.getElementById('agentsSubmitSummary').innerHTML='You have added a total of <strong>'+currencyTotalsText(totals)+'</strong> in incentives to a total of <strong>'+withAmt.length+' agent'+(withAmt.length===1?'':'s')+'</strong>. Are you sure you have applied all changes?';
             openModal('agentsSubmitModal');
         });
         document.getElementById('agentsSubmitCancel').addEventListener('click', function(){ closeModal('agentsSubmitModal'); });
@@ -2044,7 +2151,8 @@
         function buildOvertime(){
             otState.rows = ALL.filter(isAgent).map(function(r){
                 return { id:r._id, name:r.name, manager:r.manager, dept:(r.dept||[]).join(', '), title:r.titleMain, empType:r.empType, salary:r.salary, cur:r.cur, hours:'', mult:OT_MIN_MULT };
-            }).sort(function(a,b){ return a.name.localeCompare(b.name); });
+            });
+            otState.rows = sortByAmountThenName(otState.rows, function(a){ return Number(a.hours)||0; });
             otState.saved = otState.rows.map(function(a){ return { hours:a.hours, mult:a.mult }; });
             otState.dirty=false; otState.submitted=false;
         }
@@ -2114,8 +2222,9 @@
         document.getElementById('otDiscardConfirm').addEventListener('click', function(){ closeModal('otDiscardModal'); leaveOvertime(); });
 
         function saveOvertime(silent){
+            otState.rows = sortByAmountThenName(otState.rows, function(a){ return Number(a.hours)||0; });
             otState.saved = otState.rows.map(function(a){ return { hours:a.hours, mult:a.mult }; });
-            otState.dirty=false; syncOtUI();
+            otState.dirty=false; renderOvertime();
             if(!silent) toastHtml('success','Your agent overtime hours have been saved. You can keep editing or submit them to payroll when ready.');
         }
         document.getElementById('otSave').addEventListener('click', function(){ if(this.disabled) return; saveOvertime(false); });
@@ -2132,7 +2241,15 @@
             otState.dirty=false; closeModal('otDiscardChangesModal'); renderOvertime();
             toastHtml('neutral','Unsaved changes were discarded.');
         });
-        document.getElementById('otSubmit').addEventListener('click', function(){ if(this.disabled) return; openModal('otSubmitModal'); });
+        document.getElementById('otSubmit').addEventListener('click', function(){
+            if(this.disabled) return;
+            var withHrs=otState.rows.filter(function(a){ return Number(a.hours)>0; });
+            var totalHours=otState.rows.reduce(function(s,a){ return s+(Number(a.hours)||0); },0);
+            var totals=sumByCurrency(otState.rows, function(a){ return otAmount(a.salary,a.hours,a.mult); });
+            var hoursTxt=(Math.round(totalHours*100)/100);
+            document.getElementById('otSubmitSummary').innerHTML='You have added a total of <strong>'+hoursTxt+' hour'+(totalHours===1?'':'s')+' of overtime</strong>, with a total amount of <strong>'+currencyTotalsText(totals)+'</strong>, to a total of <strong>'+withHrs.length+' agent'+(withHrs.length===1?'':'s')+'</strong>. Are you sure you have applied all changes?';
+            openModal('otSubmitModal');
+        });
         document.getElementById('otSubmitCancel').addEventListener('click', function(){ closeModal('otSubmitModal'); });
         document.getElementById('otSubmitCloseX').addEventListener('click', function(){ closeModal('otSubmitModal'); });
         document.getElementById('otSubmitConfirm').addEventListener('click', function(){
@@ -2140,6 +2257,142 @@
             otState.submitted=true; otState.dirty=false;
             closeModal('otSubmitModal'); renderOvertime(); closeModal('overtimeModal');
             toastHtml('success', withHrs.length+' agent overtime record(s) have been sent to the Office Staff Payroll module for approval. In production, the Agents\' Overtime page would now be unavailable until the next cycle.');
+        });
+
+        /* ---------------- Excel upload (Incentives & Overtime) ---------------- */
+        // Generic sheet reader: returns rows starting at sheet row 2, stopping at first empty row.
+        // Column A = ID (mandatory numeric). Extra columns per config.
+        function readSheetRows(file, cb){
+            if(typeof XLSX==='undefined'){ cb({error:'The Excel reader could not be loaded. Please check your connection and try again.'}); return; }
+            var reader=new FileReader();
+            reader.onload=function(e){
+                try{
+                    var wb=XLSX.read(new Uint8Array(e.target.result), {type:'array'});
+                    var ws=wb.Sheets[wb.SheetNames[0]];
+                    var aoa=XLSX.utils.sheet_to_json(ws, {header:1, blankrows:false, defval:''});
+                    cb({aoa:aoa});
+                }catch(err){ cb({error:'This file could not be read. Please upload a valid .xlsx or .xls file.'}); }
+            };
+            reader.onerror=function(){ cb({error:'This file could not be read. Please try again.'}); };
+            reader.readAsArrayBuffer(file);
+        }
+        function cellNum(v){ if(v===''||v===null||v===undefined) return null; var n=Number(v); return isNaN(n)?NaN:n; }
+        function isBlankRow(row){ if(!row) return true; for(var i=0;i<row.length;i++){ if(row[i]!==''&&row[i]!==null&&row[i]!==undefined) return false; } return true; }
+
+        // Parse for incentives: [ID, Incentive]. Returns {map:{id:amount}, count, errors[]}
+        function parseIncentiveSheet(aoa){
+            var map={}, errors=[], count=0;
+            for(var r=1; r<aoa.length; r++){
+                var row=aoa[r];
+                if(isBlankRow(row)) break;          // stop at first empty row
+                var id=cellNum(row[0]);
+                if(id===null){ errors.push('Row '+(r+1)+': missing agent ID.'); continue; }
+                if(isNaN(id)){ errors.push('Row '+(r+1)+': agent ID must be numeric.'); continue; }
+                var inc=cellNum(row[1]);
+                if(inc===''||inc===null){ inc=0; }        // empty incentive -> 0
+                else if(isNaN(inc)){ errors.push('Row '+(r+1)+': incentive must be numeric.'); continue; }
+                if(inc<0) inc=0;
+                map[id]=Math.ceil(inc);
+                count++;
+            }
+            return {map:map, count:count, errors:errors};
+        }
+
+        // Parse for overtime: [ID, Hours, Multiplier]. Returns {map:{id:{hours,mult}}, count, errors[]}
+        function parseOvertimeSheet(aoa){
+            var map={}, errors=[], count=0;
+            for(var r=1; r<aoa.length; r++){
+                var row=aoa[r];
+                if(isBlankRow(row)) break;
+                var id=cellNum(row[0]);
+                if(id===null){ errors.push('Row '+(r+1)+': missing agent ID.'); continue; }
+                if(isNaN(id)){ errors.push('Row '+(r+1)+': agent ID must be numeric.'); continue; }
+                var h=cellNum(row[1]); if(h===null||h===''){ h=0; } else if(isNaN(h)){ errors.push('Row '+(r+1)+': overtime hours must be numeric.'); continue; }
+                if(h<0) h=0;
+                var m=cellNum(row[2]); if(m===null||m===''){ m=OT_MIN_MULT; } else if(isNaN(m)){ errors.push('Row '+(r+1)+': multiplier must be numeric.'); continue; }
+                if(m<OT_MIN_MULT) m=OT_MIN_MULT;
+                map[id]={hours:h, mult:m};
+                count++;
+            }
+            return {map:map, count:count, errors:errors};
+        }
+
+        // Generic upload dialog controller
+        function setupUploader(cfg){
+            var parsed=null;
+            var dropEl=document.getElementById(cfg.drop);
+            var fileEl=document.getElementById(cfg.file);
+            var resEl=document.getElementById(cfg.result);
+            var confirmBtn=document.getElementById(cfg.confirm);
+
+            function reset(){ parsed=null; fileEl.value=''; resEl.className='up-result'; resEl.innerHTML=''; confirmBtn.disabled=true; dropEl.classList.remove('drag'); }
+            function open(){ reset(); openModal(cfg.modal); }
+            function close(){ closeModal(cfg.modal); }
+
+            function handleFile(file){
+                if(!file) return;
+                if(!/\.(xlsx|xls)$/i.test(file.name)){ showErr('This file type is not supported. Please upload a .xlsx or .xls file.'); return; }
+                readSheetRows(file, function(out){
+                    if(out.error){ showErr(out.error); return; }
+                    var p=cfg.parse(out.aoa);
+                    if(p.count===0){
+                        showErr('No valid agent rows were found in this file. Please check the format and try again.'+(p.errors.length?'<ul><li>'+p.errors.slice(0,5).join('</li><li>')+'</li></ul>':''));
+                        return;
+                    }
+                    parsed=p;
+                    var matched=cfg.countMatches(p.map);
+                    var html='<div class="up-file"><i class="fas fa-file-excel"></i> '+esc(file.name)+'</div>';
+                    html+='<div>'+p.count+' row'+(p.count===1?'':'s')+' read \u2014 <strong>'+matched+'</strong> matched agent'+(matched===1?'':'s')+' on this page will be updated.</div>';
+                    var unmatched=p.count-matched;
+                    if(unmatched>0) html+='<div style="color:#92400e;">'+unmatched+' ID'+(unmatched===1?'':'s')+' in the file did not match any agent on this page and will be ignored.</div>';
+                    if(p.errors.length) html+='<ul>'+p.errors.slice(0,5).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join('')+(p.errors.length>5?'<li>\u2026and '+(p.errors.length-5)+' more.</li>':'')+'</ul>';
+                    resEl.className='up-result show ok'; resEl.innerHTML=html;
+                    confirmBtn.disabled=false;
+                });
+            }
+            function showErr(msg){ parsed=null; confirmBtn.disabled=true; resEl.className='up-result show err'; resEl.innerHTML='<div><i class="fas fa-circle-exclamation"></i> '+msg+'</div>'; }
+
+            document.getElementById(cfg.browse).addEventListener('click', function(){ fileEl.click(); });
+            dropEl.addEventListener('click', function(e){ if(e.target.closest('.up-browse')) return; fileEl.click(); });
+            fileEl.addEventListener('change', function(){ if(fileEl.files[0]) handleFile(fileEl.files[0]); });
+            dropEl.addEventListener('dragover', function(e){ e.preventDefault(); dropEl.classList.add('drag'); });
+            dropEl.addEventListener('dragleave', function(){ dropEl.classList.remove('drag'); });
+            dropEl.addEventListener('drop', function(e){ e.preventDefault(); dropEl.classList.remove('drag'); if(e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]); });
+            document.getElementById(cfg.openBtn).addEventListener('click', open);
+            document.getElementById(cfg.cancel).addEventListener('click', close);
+            document.getElementById(cfg.closeX).addEventListener('click', close);
+            confirmBtn.addEventListener('click', function(){ if(parsed){ cfg.apply(parsed.map); close(); } });
+        }
+
+        // Incentives uploader
+        setupUploader({
+            modal:'agentsUploadModal', openBtn:'agentsUpload', cancel:'agentsUploadCancel', closeX:'agentsUploadClose',
+            drop:'agentsDrop', file:'agentsFile', browse:'agentsBrowse', result:'agentsUploadResult', confirm:'agentsUploadConfirm',
+            parse: parseIncentiveSheet,
+            countMatches: function(map){ var n=0; agentsState.rows.forEach(function(a){ if(map.hasOwnProperty(a.id)) n++; }); return n; },
+            apply: function(map){
+                var n=0;
+                agentsState.rows.forEach(function(a){ if(map.hasOwnProperty(a.id)){ a.amount=map[a.id]; n++; } });
+                agentsState.dirty=true;
+                agentsState.rows = sortByAmountThenName(agentsState.rows, function(a){ return Number(a.amount)||0; });
+                renderAgents();
+                toastHtml('success','Incentive amounts filled in for <b>'+n+' agent'+(n===1?'':'s')+'</b> from the uploaded file. Review the values, then save or submit.');
+            }
+        });
+        // Overtime uploader
+        setupUploader({
+            modal:'otUploadModal', openBtn:'otUpload', cancel:'otUploadCancel', closeX:'otUploadClose',
+            drop:'otDrop', file:'otFile', browse:'otBrowse', result:'otUploadResult', confirm:'otUploadConfirm',
+            parse: parseOvertimeSheet,
+            countMatches: function(map){ var n=0; otState.rows.forEach(function(a){ if(map.hasOwnProperty(a.id)) n++; }); return n; },
+            apply: function(map){
+                var n=0;
+                otState.rows.forEach(function(a){ if(map.hasOwnProperty(a.id)){ a.hours=map[a.id].hours; a.mult=map[a.id].mult; n++; } });
+                otState.dirty=true;
+                otState.rows = sortByAmountThenName(otState.rows, function(a){ return Number(a.hours)||0; });
+                renderOvertime();
+                toastHtml('success','Overtime hours and multipliers filled in for <b>'+n+' agent'+(n===1?'':'s')+'</b> from the uploaded file. Review the values, then save or submit.');
+            }
         });
 
         // Buttons that open overlays
