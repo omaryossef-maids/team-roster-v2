@@ -415,6 +415,9 @@
     .up-list em { font-style: normal; background: rgba(99,102,241,0.1); color: var(--primary-hover); padding: 0.05rem 0.35rem; border-radius: 0.3rem; font-weight: 600; }
     .up-note { display: flex; gap: 0.5rem; align-items: flex-start; background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; font-size: 0.78rem; line-height: 1.5; border-radius: 0.5rem; padding: 0.6rem 0.75rem; margin-bottom: 0.85rem; }
     .up-note i { margin-top: 0.15rem; }
+    .up-sample { display: inline-flex; align-items: center; gap: 0.5rem; background: #ecfdf5; color: #047857; border: 1px solid #a7f3d0; border-radius: 0.5rem; padding: 0.55rem 0.85rem; font-size: 0.82rem; font-weight: 600; font-family: inherit; cursor: pointer; margin-bottom: 0.85rem; transition: background 0.15s, border-color 0.15s; }
+    .up-sample:hover { background: #d1fae5; border-color: #6ee7b7; }
+    .up-sample i { font-size: 0.9rem; }
     .up-drop { border: 2px dashed var(--border-color); border-radius: 0.7rem; padding: 1.5rem 1rem; text-align: center; transition: border-color 0.15s, background 0.15s; cursor: pointer; }
     .up-drop:hover, .up-drop.drag { border-color: var(--primary-color); background: rgba(99,102,241,0.04); }
     .up-drop-icon { font-size: 1.6rem; color: var(--primary-color); margin-bottom: 0.5rem; }
@@ -871,17 +874,9 @@
     <div class="modal-overlay" id="agentsUploadModal"><div class="modal modal-upload">
         <div class="modal-header"><h3><i class="fas fa-file-excel" style="color:#16a34a;"></i> Upload incentives from Excel</h3><button type="button" class="close-x" id="agentsUploadClose"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
-            <p class="modal-intro">Upload an Excel file with your agent IDs and each agent's incentive amount. The system will automatically fill in the Incentive Amount column for the matching agents.</p>
-            <div class="up-section">
-                <div class="up-section-title"><i class="fas fa-table-list"></i> File format &amp; instructions</div>
-                <ul class="up-list">
-                    <li><strong>Row 1</strong> is the header row (e.g. <em>ID</em>, <em>Incentive</em>). The system starts reading from <strong>row 2</strong>.</li>
-                    <li><strong>Column A</strong> = Agent ID, <strong>Column B</strong> = Incentive amount. Both must be numeric. Any column from <strong>C</strong> onward is ignored.</li>
-                    <li>No empty rows in between — reading starts at row 2 and <strong>stops at the first empty row</strong>.</li>
-                    <li>The <strong>ID is mandatory</strong>; the incentive is optional. If an ID is present but its incentive is empty, that agent's incentive is set to <strong>0</strong> (overriding any current value).</li>
-                </ul>
-            </div>
-            <div class="up-note"><i class="fas fa-circle-info"></i> <span>Once you confirm, the incentive amount of every agent whose ID is in the sheet will be overridden with the sheet's value.</span></div>
+            <p class="modal-intro">Upload an Excel file with your agent IDs in column A and each agent's incentive amount in column B, and the system will fill in the Incentive Amount column automatically. Download the example file below to see the expected format.</p>
+            <button type="button" class="up-sample" id="agentsSample"><i class="fas fa-file-arrow-down"></i> Download example file</button>
+            <div class="up-note"><i class="fas fa-circle-info"></i> <span>Once you confirm, the incentive amount of every agent whose ID is in the sheet will be overridden with the sheet's value. Any agent whose ID is not in the sheet keeps their current value.</span></div>
             <div class="up-drop" id="agentsDrop">
                 <input type="file" id="agentsFile" accept=".xlsx,.xls" hidden>
                 <i class="fas fa-cloud-arrow-up up-drop-icon"></i>
@@ -897,17 +892,9 @@
     <div class="modal-overlay" id="otUploadModal"><div class="modal modal-upload">
         <div class="modal-header"><h3><i class="fas fa-file-excel" style="color:#16a34a;"></i> Upload overtime from Excel</h3><button type="button" class="close-x" id="otUploadClose"><i class="fas fa-times"></i></button></div>
         <div class="modal-body">
-            <p class="modal-intro">Upload an Excel file with your agent IDs, overtime hours, and multiplier. The system will automatically fill in the Overtime Hours and Multiplier columns for the matching agents.</p>
-            <div class="up-section">
-                <div class="up-section-title"><i class="fas fa-table-list"></i> File format &amp; instructions</div>
-                <ul class="up-list">
-                    <li><strong>Row 1</strong> is the header row (e.g. <em>ID</em>, <em>Overtime Hours</em>, <em>Multiplier</em>). The system starts reading from <strong>row 2</strong>.</li>
-                    <li><strong>Column A</strong> = Agent ID, <strong>Column B</strong> = Overtime hours, <strong>Column C</strong> = Multiplier. All must be numeric. Any column from <strong>D</strong> onward is ignored.</li>
-                    <li>No empty rows in between — reading starts at row 2 and <strong>stops at the first empty row</strong>.</li>
-                    <li>The <strong>ID is mandatory</strong>. If <strong>overtime hours</strong> is empty it is counted as <strong>0</strong>; if <strong>multiplier</strong> is empty it defaults to <strong>1.25</strong> (values below 1.25 are raised to 1.25).</li>
-                </ul>
-            </div>
-            <div class="up-note"><i class="fas fa-circle-info"></i> <span>Once you confirm, the overtime hours and multiplier of every agent whose ID is in the sheet will be overridden with the sheet's values.</span></div>
+            <p class="modal-intro">Upload an Excel file with your agent IDs in column A, overtime hours in column B, and multiplier in column C, and the system will fill in those columns automatically. If the multiplier column is left empty, the system fills it in as 1.25 automatically. Download the example file below to see the expected format.</p>
+            <button type="button" class="up-sample" id="otSample"><i class="fas fa-file-arrow-down"></i> Download example file</button>
+            <div class="up-note"><i class="fas fa-circle-info"></i> <span>Once you confirm, the overtime hours and multiplier of every agent whose ID is in the sheet will be overridden with the sheet's values. Any agent whose ID is not in the sheet keeps their current values.</span></div>
             <div class="up-drop" id="otDrop">
                 <input type="file" id="otFile" accept=".xlsx,.xls" hidden>
                 <i class="fas fa-cloud-arrow-up up-drop-icon"></i>
@@ -2362,12 +2349,46 @@
             document.getElementById(cfg.cancel).addEventListener('click', close);
             document.getElementById(cfg.closeX).addEventListener('click', close);
             confirmBtn.addEventListener('click', function(){ if(parsed){ cfg.apply(parsed.map); close(); } });
+            if(cfg.sample){
+                document.getElementById(cfg.sample).addEventListener('click', function(){
+                    if(typeof XLSX==='undefined'){ toastHtml('neutral','The sample file could not be generated right now. Please check your connection and try again.'); return; }
+                    try {
+                        var aoa=cfg.buildSample();
+                        var ws=XLSX.utils.aoa_to_sheet(aoa);
+                        var wb=XLSX.utils.book_new();
+                        XLSX.utils.book_append_sheet(wb, ws, cfg.sampleSheet);
+                        XLSX.writeFile(wb, cfg.sampleName);
+                    } catch(e){ toastHtml('neutral','The sample file could not be generated right now.'); }
+                });
+            }
         }
 
         // Incentives uploader
         setupUploader({
             modal:'agentsUploadModal', openBtn:'agentsUpload', cancel:'agentsUploadCancel', closeX:'agentsUploadClose',
             drop:'agentsDrop', file:'agentsFile', browse:'agentsBrowse', result:'agentsUploadResult', confirm:'agentsUploadConfirm',
+            sample:'agentsSample', sampleName:'agents_incentives_sample.xlsx', sampleSheet:'Incentives',
+            buildSample: function(){
+                // Static example: 15 agent IDs (178–4800); 12 with an incentive, 3 left blank
+                return [
+                    ['ID','Incentive'],
+                    [178, 500],
+                    [342, 750],
+                    [561, 300],
+                    [899, 1200],
+                    [1044, ''],
+                    [1350, 650],
+                    [1687, 400],
+                    [2011, 900],
+                    [2456, ''],
+                    [2890, 550],
+                    [3125, 1000],
+                    [3540, 250],
+                    [3999, ''],
+                    [4321, 800],
+                    [4800, 600]
+                ];
+            },
             parse: parseIncentiveSheet,
             countMatches: function(map){ var n=0; agentsState.rows.forEach(function(a){ if(map.hasOwnProperty(a.id)) n++; }); return n; },
             apply: function(map){
@@ -2383,6 +2404,32 @@
         setupUploader({
             modal:'otUploadModal', openBtn:'otUpload', cancel:'otUploadCancel', closeX:'otUploadClose',
             drop:'otDrop', file:'otFile', browse:'otBrowse', result:'otUploadResult', confirm:'otUploadConfirm',
+            sample:'otSample', sampleName:'agents_overtime_sample.xlsx', sampleSheet:'Overtime',
+            buildSample: function(){
+                // Static example: 15 agent IDs (178–4800)
+                //  • 4 rows: hours + multiplier other than 1.25
+                //  • 7 rows: hours + multiplier = 1.25
+                //  • 3 rows: hours only (multiplier blank → defaults to 1.25)
+                //  • 1 row : ID only (hours blank → 0)
+                return [
+                    ['ID','Overtime Hours','Multiplier'],
+                    [178, 12, 1.5],
+                    [342, 8, 1.75],
+                    [561, 20, 2],
+                    [899, 6, 1.6],
+                    [1044, 10, 1.25],
+                    [1350, 15, 1.25],
+                    [1687, 9, 1.25],
+                    [2011, 5, 1.25],
+                    [2456, 18, 1.25],
+                    [2890, 7, 1.25],
+                    [3125, 11, 1.25],
+                    [3540, 14, ''],
+                    [3999, 4, ''],
+                    [4321, 22, ''],
+                    [4800, '', '']
+                ];
+            },
             parse: parseOvertimeSheet,
             countMatches: function(map){ var n=0; otState.rows.forEach(function(a){ if(map.hasOwnProperty(a.id)) n++; }); return n; },
             apply: function(map){
