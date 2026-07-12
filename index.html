@@ -149,7 +149,7 @@
     .cols-saved-msg.show { display: inline; }
 
     /* ---------- Table ---------- */
-    .roster-table-wrap { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0.75rem; overflow-y: auto; overflow-x: hidden; }
+    .roster-table-wrap { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 0.75rem; overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable; }
     .roster-table-wrap.scroll { overflow-x: auto; }
     table.roster-table { border-collapse: separate; border-spacing: 0; width: 100%; font-size: 0.82rem; }
     .roster-table-wrap.scroll table.roster-table { width: auto; min-width: 100%; }
@@ -185,7 +185,54 @@
     .b-type-expat { background: #fef9c3; color: #854d0e; }
     .sub-note { color: var(--text-muted); font-size: 0.72rem; display: block; margin-top: 0.15rem; }
 
+    /* ---- Rich fields (multi-line cells) ---- */
+    .rf { display: flex; flex-direction: column; gap: 0.15rem; align-items: flex-start; }
+    .rf-title { font-weight: 700; font-size: 0.86rem; color: var(--primary-color); text-decoration: none; }
+    .rf-title:hover { text-decoration: underline; }
+    .rf-title-sm { font-weight: 600; font-size: 0.84rem; color: var(--text-primary); }
+    .rf-sub { font-size: 0.74rem; color: var(--text-secondary); font-style: italic; }
+    .rf-sub.rf-muted { color: var(--text-muted); font-style: normal; }
+    .rf-status { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.72rem; font-weight: 700; margin-top: 0.05rem; }
+    .rf-status i { font-size: 0.4rem; }
+    .rf-status.st-active { color: #059669; }
+    .rf-status.st-term { color: #dc2626; }
+    .rf-flag { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.7rem; font-weight: 700; padding: 0.1rem 0.45rem; border-radius: 999px; }
+    .rf-flag.flag-hold { background: #fef2f2; color: #b91c1c; }
+    .rf-flag.flag-hold i { font-size: 0.62rem; }
+    /* consolidated Salary Changes / Loans cell */
+    .chg-line { display: flex; align-items: baseline; flex-wrap: wrap; gap: 0.3rem; line-height: 1.45; margin-bottom: 0.2rem; }
+    .chg-line:last-child { margin-bottom: 0; }
+    .chg-tag { flex: 0 0 auto; font-size: 0.6rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.02em; padding: 0.08rem 0.35rem; border-radius: 0.3rem; }
+    .chg-tag.t-pos { background: #ecfdf5; color: #047857; }
+    .chg-tag.t-neg { background: #fef2f2; color: #b91c1c; }
+    .chg-tag.t-neutral { background: #eff6ff; color: #1d4ed8; }
+    .chg-tag.t-pending { background: #f1f5f9; color: #64748b; }
+    .chg-amt { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .chg-reason { color: var(--text-muted); font-size: 0.74rem; }
+    .pending-item .chg-amt, .pending-item .chg-reason { font-style: italic; color: #94a3b8; font-weight: 500; }
+    /* rich-field column widths — no horizontal scroll, table fills width */
+    table.roster-table { table-layout: fixed; width: 100%; }
+    table.roster-table tbody td, table.roster-table thead th { overflow: hidden; word-break: break-word; overflow-wrap: anywhere; }
+    .rf { min-width: 0; max-width: 100%; }
+    .rf > * { max-width: 100%; overflow-wrap: anywhere; }
+    .chg-line { min-width: 0; }
+    table.roster-table thead th { padding: 0.6rem 0.5rem; }
+    table.roster-table tbody td { padding: 0.6rem 0.5rem; }
+    th.col-employee { width: 12%; }
+    th.col-manager { width: 9.5%; }
+    th.col-title { width: 11.5%; }
+    th.col-type { width: 8%; }
+    th.col-salary { width: 8.5%; }
+    th.col-changes { width: 14%; }
+    th.col-loans { width: 10%; }
+    th.col-repay { width: 8%; }
+    th.col-net { width: 7.5%; }
+    th.col-transfer { width: 8%; }
+    th.cell-actions { width: 5%; white-space: nowrap; }
+    td.col-net, td.col-transfer, td.col-salary, td.col-repay { font-size: 0.8rem; }
+
     .cell-actions { text-align: center; }
+    th.cell-actions { text-align: center; overflow: visible; }
     .action-menu-btn { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 30px; font-size: 0.9rem; background: var(--bg-card); color: var(--text-secondary); border: 1px solid var(--border-color); border-radius: 0.5rem; cursor: pointer; transition: all 0.15s; }
     .action-menu-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
     .action-menu-btn.active { border-color: var(--primary-color); color: var(--primary-color); box-shadow: 0 0 0 3px rgba(99,102,241,0.1); }
@@ -567,23 +614,6 @@
                         <button type="button" class="btn btn-outline btn-sm" id="btnPending"><i class="fas fa-hourglass-half"></i> Pending Requests <span class="btn-badge" id="pendingCount">0</span></button>
                         <button type="button" class="btn btn-outline btn-sm" id="btnAgents"><i class="fas fa-people-group"></i> Agents' Incentives</button>
                         <button type="button" class="btn btn-outline btn-sm" id="btnOvertime"><i class="fas fa-business-time"></i> Agents' Overtime</button>
-                        <div class="cols-wrap" id="colsWrap">
-                            <button type="button" class="btn btn-outline btn-sm" id="btnCols"><i class="fas fa-table-columns"></i> Show additional columns <i class="fas fa-chevron-down" style="font-size:0.6rem;"></i></button>
-                            <div class="cols-panel">
-                                <div class="cols-panel-title" style="display:flex;align-items:center;justify-content:space-between;gap:0.5rem;">
-                                    <span>Additional columns</span>
-                                    <span class="cols-bulk">
-                                        <button type="button" class="cols-bulk-btn" id="btnColsSelectAll">Select All</button>
-                                        <button type="button" class="cols-bulk-btn" id="btnColsClear">Clear</button>
-                                    </span>
-                                </div>
-                                <div id="colOptions"></div>
-                                <div class="cols-panel-footer">
-                                    <button type="button" class="btn btn-primary btn-sm" id="btnSaveView"><i class="fas fa-floppy-disk"></i> Save as default view</button>
-                                    <span class="cols-saved-msg" id="savedMsg"><i class="fas fa-check"></i> Saved</span>
-                                </div>
-                            </div>
-                        </div>
                     </div>
 
                     <div id="rosterPanel"></div>
@@ -1088,31 +1118,23 @@
         })();
 
         /* ---------------- Columns ---------------- */
+        // Rich-field columns: each cell can carry several related data points, so the table needs
+        // no horizontal scroll and no fixed/additional toggle. Department, Roster Manager, Country,
+        // Nationality, Transfer Method, Status, Joining Date are folded into richer cells below.
         var COLUMNS = [
-            { key:'name', label:'Office Staff Name', type:'main', cls:'col-name' },
-            { key:'manager', label:'Manager', type:'main' },
-            { key:'rosterMgr', label:'Roster Manager', type:'additional' },
-            { key:'dept', label:'Department', type:'additional', wrap:true },
-            { key:'title', label:'Job Title', type:'main', wrap:true },
-            { key:'joinDate', label:'Joining Date', type:'additional' },
-            { key:'empType', label:'Employee Type', type:'allOnly' },
-            { key:'status', label:'Status', type:'additional' },
-            { key:'salary', label:'Salary', type:'main' },
-            { key:'country', label:'Country', type:'additional' },
-            { key:'nationality', label:'Nationality', type:'additional' },
-            { key:'method', label:'Salary Transfer Method', type:'additional' },
-            { key:'loan', label:'Loan Repayment', type:'main' },
-            { key:'newLoans', label:'New Loans', type:'main', wrap:true },
-            { key:'additions', label:'Additions', type:'main', wrap:true },
-            { key:'deductions', label:'Deductions', type:'main', wrap:true },
-            { key:'raise', label:'Salary Raise', type:'main' },
-            { key:'reduction', label:'Salary Reduction', type:'main' },
-            { key:'net', label:'Net Salary', type:'main' },
-            { key:'toTransfer', label:'Salary to be Transferred', type:'additional' },
-            { key:'onhold', label:'Salary On-Hold', type:'additional' },
+            { key:'employee', label:'Employee', type:'main', cls:'col-employee' },
+            { key:'manager', label:'Manager', type:'main', cls:'col-manager' },
+            { key:'title', label:'Job Title', type:'main', cls:'col-title', wrap:true },
+            { key:'empType', label:'Employee Type', type:'main', cls:'col-type' },
+            { key:'salary', label:'Salary', type:'main', cls:'col-salary' },
+            { key:'changes', label:'Salary Changes', type:'main', cls:'col-changes', wrap:true },
+            { key:'loans', label:'Loans', type:'main', cls:'col-loans', wrap:true },
+            { key:'repayments', label:'Monthly Repayments', type:'main', cls:'col-repay' },
+            { key:'net', label:'Net Salary', type:'main', cls:'col-net' },
+            { key:'toTransfer', label:'Salary to be Transferred', type:'main', cls:'col-transfer' },
             { key:'actions', label:'Actions', type:'main', cls:'cell-actions' }
         ];
-        var ADDITIONAL_KEYS = COLUMNS.filter(function(c){ return c.type==='additional'; }).map(function(c){ return c.key; });
+        var ADDITIONAL_KEYS = [];
 
         /* ---------------- State ---------------- */
         var state = { tab:'all', search:'', manager:'', rosterMgr:'', title:'', dept:'', addl:{}, visibleAdditional:{}, defaultAdditional:{} };
@@ -1143,38 +1165,101 @@
         function typeBadge(t){ var c=t==='Emirati'?'b-type-emirati':(t==='Overseas'?'b-type-overseas':'b-type-expat'); return '<span class="badge '+c+'">'+esc(t)+'</span>'; }
         function distinct(rows,getter){ var s=[]; rows.forEach(function(r){ getter(r).forEach(function(v){ if(v&&s.indexOf(v)===-1) s.push(v); }); }); s.sort(); return s; }
 
-        /* ---------------- Cell renderer ---------------- */
+        /* ---------------- Rich-cell helpers ---------------- */
+        // A labelled money line used inside the consolidated "Salary Changes" cell
+        function changeLine(label,amount,cur,cls,pending){
+            var out='';
+            if(amount) out+='<span class="chg-line"><span class="chg-tag '+cls+'">'+label+'</span><span class="chg-amt">'+fmt(amount,cur)+'</span></span>';
+            return out;
+        }
+        function itemChangeLines(label,arr,cur,cls){
+            return (arr||[]).map(function(i){
+                return '<span class="chg-line"><span class="chg-tag '+cls+'">'+label+'</span><span class="chg-amt">'+fmt(i.amt,cur)+'</span> <span class="chg-reason">'+esc(i.reason)+'</span></span>';
+            }).join('');
+        }
+        function pendingItemLines(label,arr,cur){
+            return (arr||[]).map(function(i){
+                return '<span class="chg-line pending-item"><span class="chg-tag t-pending">'+label+'</span><span class="chg-amt">'+fmt(i.amt,cur)+'</span> <span class="chg-reason">'+esc(i.reason)+' (pending)</span></span>';
+            }).join('');
+        }
+        function pendingSingleLine(label,amount,cur){
+            if(!amount) return '';
+            return '<span class="chg-line pending-item"><span class="chg-tag t-pending">'+label+'</span><span class="chg-amt">'+fmt(amount,cur)+'</span> <span class="chg-reason">(pending)</span></span>';
+        }
+
+        /* ---------------- Cell renderer (rich fields) ---------------- */
         function cell(col,r){
             var cur=r.cur;
             switch(col.key){
-                case 'name': return '<a href="#" class="cell-name emp-name-link" data-history-id="'+r._id+'">'+esc(r.name)+'</a>';
-                case 'manager': return esc(r.manager);
-                case 'rosterMgr': return esc(r.rosterMgr);
-                case 'dept': return esc((r.dept||[]).join(', '));
-                case 'title': return '<span class="jt-main">'+esc(r.titleMain)+'</span><span class="jt-spec">('+esc(r.titleSpec)+')</span>';
-                case 'joinDate': return fmtDate(r.joinDate);
-                case 'empType': return typeBadge(r.empType);
-                case 'status': return r.status==='terminated'?'<span class="badge b-terminated"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Terminated</span>':'<span class="badge b-active"><i class="fas fa-circle" style="font-size:0.5rem;"></i> Active</span>';
-                case 'salary': return '<span class="num">'+fmt(r.salary,cur)+'</span>';
-                case 'country': return esc(r.country);
-                case 'nationality': return esc(r.nationality);
-                case 'method': return esc(r.method);
-                case 'loan': return r.loan?'<span class="num num-neg">'+fmt(r.loan,cur)+'</span>':'<span class="num num-zero">&mdash;</span>';
-                case 'newLoans': return itemsHtml(r.newLoans,cur,r.pending.newLoans);
-                case 'additions': return itemsHtml(r.additions,cur,r.pending.additions);
-                case 'deductions': return itemsHtml(r.deductions,cur,r.pending.deductions);
-                case 'raise': return singleValHtml(r.raise,r.pending.raise,cur,'num-pos');
-                case 'reduction': return singleValHtml(r.reduction,r.pending.reduction,cur,'num-neg');
-                case 'net': return '<span class="num net-salary">'+fmt(net(r),cur)+'</span>';
-                case 'toTransfer': var note=(!r.onhold&&r.prevUnpaid)?'<span class="sub-note">incl. '+fmt(r.prevUnpaid,cur)+' prev. unpaid</span>':''; return '<span class="num">'+fmt(toTransfer(r),cur)+'</span>'+note;
-                case 'onhold': return r.onhold?'<span class="badge b-onhold-yes">Yes</span>':'<span class="badge b-onhold-no">No</span>';
-                case 'actions': return '<button type="button" class="action-menu-btn" data-id="'+r._id+'" data-name="'+esc(r.name)+'" data-cur="'+cur+'" title="Actions"><i class="fas fa-ellipsis-v"></i></button>';
+                case 'employee':
+                    var statusBadge = r.status==='terminated'
+                        ? '<span class="rf-status st-term"><i class="fas fa-circle"></i> Terminated</span>'
+                        : '<span class="rf-status st-active"><i class="fas fa-circle"></i> Active</span>';
+                    return '<div class="rf">'
+                        +'<a href="#" class="rf-title emp-name-link" data-history-id="'+r._id+'">'+esc(r.name)+'</a>'
+                        +'<span class="rf-sub">Located in '+esc(r.country)+'</span>'
+                        +statusBadge
+                        +'</div>';
+                case 'manager':
+                    return '<div class="rf">'
+                        +'<span class="rf-title-sm">'+esc(r.manager)+'</span>'
+                        +'<span class="rf-sub">Roster: '+esc(r.rosterMgr)+'</span>'
+                        +'</div>';
+                case 'title':
+                    return '<div class="rf">'
+                        +'<span class="rf-title-sm">'+esc(r.titleMain)+'</span>'
+                        +'<span class="rf-sub">('+esc(r.titleSpec)+')</span>'
+                        +'<span class="rf-sub rf-muted">Started on '+fmtDate(r.joinDate)+'</span>'
+                        +'</div>';
+                case 'empType':
+                    return '<div class="rf">'
+                        +typeBadge(r.empType)
+                        +'<span class="rf-sub">'+esc(r.nationality)+'</span>'
+                        +'</div>';
+                case 'salary':
+                    return '<div class="rf">'
+                        +'<span class="num">'+fmt(r.salary,cur)+'</span>'
+                        +'<span class="rf-sub rf-muted">'+esc(r.method)+'</span>'
+                        +'</div>';
+                case 'changes':
+                    var out='';
+                    out+=changeLine('Raise',r.raise,cur,'t-pos');
+                    out+=changeLine('Reduction',r.reduction,cur,'t-neg');
+                    out+=itemChangeLines('Addition',r.additions,cur,'t-pos');
+                    out+=itemChangeLines('Deduction',r.deductions,cur,'t-neg');
+                    // pending
+                    out+=pendingSingleLine('Raise',r.pending.raise,cur);
+                    out+=pendingSingleLine('Reduction',r.pending.reduction,cur);
+                    out+=pendingItemLines('Addition',r.pending.additions,cur);
+                    out+=pendingItemLines('Deduction',r.pending.deductions,cur);
+                    return out || '<span class="num-zero">&mdash;</span>';
+                case 'loans':
+                    var lo=itemChangeLines('New loan',r.newLoans,cur,'t-neutral')+pendingItemLines('New loan',r.pending.newLoans,cur);
+                    return lo || '<span class="num-zero">&mdash;</span>';
+                case 'repayments':
+                    return r.loan?'<span class="num num-neg">'+fmt(r.loan,cur)+'</span>':'<span class="num-zero">&mdash;</span>';
+                case 'net':
+                    return '<span class="num net-salary">'+fmt(net(r),cur)+'</span>';
+                case 'toTransfer':
+                    if(r.onhold){
+                        return '<div class="rf">'
+                            +'<span class="num num-zero">'+fmt(0,cur)+'</span>'
+                            +'<span class="rf-flag flag-hold"><i class="fas fa-lock"></i> On hold</span>'
+                            +'</div>';
+                    }
+                    var note=r.prevUnpaid?'<span class="rf-sub rf-muted">incl. '+fmt(r.prevUnpaid,cur)+' prev. unpaid</span>':'';
+                    return '<div class="rf">'
+                        +'<span class="num">'+fmt(toTransfer(r),cur)+'</span>'
+                        +note
+                        +'</div>';
+                case 'actions':
+                    return '<button type="button" class="action-menu-btn" data-id="'+r._id+'" data-name="'+esc(r.name)+'" data-cur="'+cur+'" title="Actions"><i class="fas fa-ellipsis-v"></i></button>';
             }
             return '';
         }
 
-        function isVisible(col){ if(col.type==='main') return true; if(col.type==='allOnly') return state.tab==='all'; if(col.type==='additional') return !!state.visibleAdditional[col.key]; return false; }
-        function anyAdditionalVisible(){ return ADDITIONAL_KEYS.some(function(k){ return !!state.visibleAdditional[k]; }); }
+        function isVisible(col){ return true; } // rich fields: every column is always shown
+        function anyAdditionalVisible(){ return false; } // no horizontal scroll in the rich-field layout
 
         /* ---------------- Pending requests (team-wide) ---------------- */
         var PENDING=[]; var _pseq=0;
@@ -1347,23 +1432,6 @@
         function syncAddlChips(){ document.querySelectorAll('#addlFilters .chk-chip').forEach(function(chip){ chip.classList.toggle('checked', !!state.addl[chip.getAttribute('data-k')]); }); }
 
         /* ---------------- Additional columns panel ---------------- */
-        function buildColOptions(){
-            var box=document.getElementById('colOptions');
-            box.innerHTML=COLUMNS.filter(function(c){ return c.type==='additional'; }).map(function(c){ return '<label class="col-opt"><input type="checkbox" data-col="'+c.key+'"> '+esc(c.label)+'</label>'; }).join('');
-            box.querySelectorAll('input[data-col]').forEach(function(cb){ cb.addEventListener('change', function(){ state.visibleAdditional[cb.getAttribute('data-col')]=cb.checked; syncColBulkButtons(); renderTable(); }); });
-        }
-        function syncColOptions(){
-            document.querySelectorAll('#colOptions input[data-col]').forEach(function(cb){ cb.checked=!!state.visibleAdditional[cb.getAttribute('data-col')]; });
-            syncColBulkButtons();
-        }
-        function syncColBulkButtons(){
-            var total=ADDITIONAL_KEYS.length;
-            var selected=ADDITIONAL_KEYS.filter(function(k){ return !!state.visibleAdditional[k]; }).length;
-            var sa=document.getElementById('btnColsSelectAll'), cl=document.getElementById('btnColsClear');
-            if(sa) sa.disabled = (selected===total);
-            if(cl) cl.disabled = (selected===0);
-        }
-
         /* ---------------- Wiring ---------------- */
         document.getElementById('fSearch').addEventListener('input', function(){ state.search=this.value; renderTable(); });
 
@@ -1372,27 +1440,8 @@
                 document.querySelectorAll('.roster-tab[data-tab]').forEach(function(x){ x.classList.remove('active'); });
                 t.classList.add('active');
                 state.tab=t.getAttribute('data-tab');
-                state.visibleAdditional={}; for(var k in state.defaultAdditional){ if(state.defaultAdditional[k]) state.visibleAdditional[k]=true; }
-                refreshSelects(); syncColOptions(); renderTable();
+                refreshSelects(); renderTable();
             });
-        });
-
-        var colsWrap=document.getElementById('colsWrap');
-        document.getElementById('btnCols').addEventListener('click', function(e){ e.stopPropagation(); colsWrap.classList.toggle('open'); syncColOptions(); });
-        document.addEventListener('click', function(e){ if(!colsWrap.contains(e.target)) colsWrap.classList.remove('open'); });
-        document.getElementById('btnSaveView').addEventListener('click', function(){
-            state.defaultAdditional={}; for(var k in state.visibleAdditional){ if(state.visibleAdditional[k]) state.defaultAdditional[k]=true; }
-            var msg=document.getElementById('savedMsg'); msg.classList.add('show'); setTimeout(function(){ msg.classList.remove('show'); },1800);
-        });
-        document.getElementById('btnColsSelectAll').addEventListener('click', function(){
-            if(this.disabled) return;
-            ADDITIONAL_KEYS.forEach(function(k){ state.visibleAdditional[k]=true; });
-            syncColOptions(); renderTable();
-        });
-        document.getElementById('btnColsClear').addEventListener('click', function(){
-            if(this.disabled) return;
-            state.visibleAdditional={};
-            syncColOptions(); renderTable();
         });
 
         // Reset Filters: clear search, dropdowns, and additional-filter chips
@@ -1446,7 +1495,7 @@
         function closeModal(id){ document.getElementById(id).classList.remove('open'); }
         document.addEventListener('click', function(e){ var c=e.target.closest('[data-close]'); if(c){ var mid=c.getAttribute('data-close'); closeModal(mid); if(mid==='historyModal') document.getElementById('historyModal').classList.remove('over-pending'); } });
         // Action modals do not close on backdrop click or Escape — only via Cancel or the "x"
-        document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ hideMenu(); colsWrap.classList.remove('open'); closeAllSelects(); } });
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape'){ hideMenu(); closeAllSelects(); } });
 
         document.querySelectorAll('.nav-collapsible-header').forEach(function(h){ h.addEventListener('click', function(){ this.parentElement.classList.toggle('open'); }); });
 
@@ -2455,7 +2504,7 @@
         document.getElementById('raiseAmount').addEventListener('change', function(){ onAmountChange('raise'); });
         document.getElementById('addAmount').addEventListener('change', function(){ onAmountChange('add'); });
         document.getElementById('dedAmount').addEventListener('change', function(){ onAmountChange('ded'); });
-        buildAddlFilters(); buildColOptions(); refreshTabCounts(); refreshSelects(); renderTable();
+        buildAddlFilters(); refreshTabCounts(); refreshSelects(); renderTable();
         buildPending(); document.getElementById('pendingCount').textContent=PENDING.length;
         requestAnimationFrame(layout);
     })();
